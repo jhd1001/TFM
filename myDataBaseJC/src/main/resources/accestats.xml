@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+    <package name="stats" namespace="/stats" extends="struts-default">
+
+        <action name="Login_*" class="stats.actions.Login" method="{1}">
+            <result name="centros">/WEB-INF/stats/Login.jsp</result>
+            <result name="cpd">/WEB-INF/stats/LoginCPD.jsp</result>
+            <result name="cerrada">/WEB-INF/stats/Error.jsp</result>
+            <result name="error">/WEB-INF/stats/Error.jsp</result>
+            <result>/WEB-INF/stats/Menu.jsp</result>
+            <result name="cpdok">/WEB-INF/stats/MenuCPD.jsp</result>
+            <result name="cambiarConvocatoria">/WEB-INF/stats/CambiaConvo.jsp</result>
+        </action>
+
+        <action name="Stats_*" class="stats.actions.Stats" method="{1}">
+            <result name="input">/WEB-INF/stats/Menu.jsp</result>
+            <result>/WEB-INF/stats/Menu.jsp</result>
+            <result name="error">/WEB-INF/stats/Error.jsp</result>
+            <result name="clogescp">/WEB-INF/stats/Clogescp.jsp</result>
+            <result name="clogesmo">/WEB-INF/stats/Clogesmo.jsp</result>
+            <result name="clogesma">/WEB-INF/stats/Clogesma.jsp</result>
+        </action>
+        
+        <action name="Actilla_*" class="stats.actions.Actilla" method="{1}">
+            <result name="input">/WEB-INF/stats/Menu.jsp</result>
+            <result type="stream">
+                <param name="contentType">application/pdf</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">inline</param>
+                <param name="bufferSize">1024</param>
+            </result>
+        </action>
+        
+        <action name="Fichas_*" class="stats.actions.Fichas" method="{1}">
+            <result name="input">/WEB-INF/stats/Menu.jsp</result>
+            <result type="stream">
+                <param name="contentType">application/pdf</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">inline</param>
+                <param name="bufferSize">1024</param>
+            </result>
+        </action>
+        
+        <action name="Traslados_*" class="stats.actions.Traslados" method="{1}">
+            <result name="input">/WEB-INF/stats/MenuCPD.jsp</result>
+            <result name="notificar">/WEB-INF/stats/NotificarTraslados.jsp</result>
+            <result name="notificadoOK">/WEB-INF/stats/TrasladosNotificados.jsp</result>
+            <result name="verNotificacionesOK">/WEB-INF/stats/NotificacionesRealizadas.jsp</result>
+            <result name="verProcesoOK">/WEB-INF/stats/TrasladosNotificados.jsp</result>
+            <result name="uploadOK">/WEB-INF/stats/NotificarTraslados.jsp</result>
+            <result name="reenviarOK">/WEB-INF/stats/TrasladosNotificados.jsp</result>
+            <result name="sinPermiso">/WEB-INF/jsp/errorSinPermiso.jsp</result>
+            <result name="error">/WEB-INF/stats/Error.jsp</result>
+            <result name="downloadOK" type="stream">
+                <param name="contentType">application/zip</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename=%{notificacion+".zip"}</param>
+                <param name="bufferSize">1024</param>
+            </result>
+        </action>
+        
+        <action name="Privadas_*" class="stats.actions.Privadas" method="{1}">
+            <result name="cerrada">/WEB-INF/stats/Error.jsp</result>
+            <result name="input">/WEB-INF/stats/MenuCPD.jsp</result>
+            <result name="actaFGOK" type="stream">
+                <param name="contentType">application/pdf</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">inline</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            <result name="actaFEOK" type="stream">
+                <param name="contentType">application/pdf</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">inline</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            <result name="actillaOK" type="stream">
+                <param name="contentType">application/pdf</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">inline</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            
+            <result name="centros_notificar">/WEB-INF/stats/NotificarCentros.jsp</result>
+            <result name="actillaNotificadaOK">/WEB-INF/stats/MenuCPD.jsp</result>
+            
+            <result name="alumnos_notificar">/WEB-INF/stats/NotificarAlumnos.jsp</result>
+            <result name="fichaNotificadaOK">/WEB-INF/stats/MenuCPD.jsp</result>
+
+            <result name="alumnos_25_notificar">/WEB-INF/stats/NotificarAlumnos25.jsp</result>
+            <result name="ficha25NotificadaOK">/WEB-INF/stats/MenuCPD.jsp</result>
+            
+            <result name="asiYcentrosOK">/WEB-INF/stats/AsignaturasYCentros.jsp</result>
+            <result name="asiYcentrosTxtOK" type="stream">
+                <param name="contentType">application/txt</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename=AsignaturasYCentros.txt</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            
+            <result name="resumenXmateriasOK">/WEB-INF/stats/ResumenPorMaterias.jsp</result>
+            <result name="resumenXmateriasTxtOK" type="stream">
+                <param name="contentType">application/txt</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename=ResumenXMaterias.txt</param>
+                <param name="bufferSize">1024</param>
+            </result>
+
+            <result name="resumenXmodalidadesOK">/WEB-INF/stats/ResumenPorModalidades.jsp</result>
+            <result name="resumenXmodalidadesTxtOK" type="stream">
+                <param name="contentType">application/txt</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename=ResumenXModalidades.txt</param>
+                <param name="bufferSize">1024</param>
+            </result>
+
+            <result name="subirNotaOK">/WEB-INF/stats/MatriculadosSubirNota.jsp</result>
+            <result name="noPresentadosOK">/WEB-INF/stats/AlumnosNoPresentados.jsp</result>
+            <result name="mejoresNotasOK">/WEB-INF/stats/AlumnosMejoresNotas.jsp</result>
+            <result name="mejoresNotasDireccionOK" type="stream">
+                <param name="contentType">application/excel</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename=${filename}</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            <result name="centYasigsOK">/WEB-INF/stats/CentrosYAsignaturas.jsp</result>
+            <result name="centYasigsTxtOK" type="stream">
+                <param name="contentType">application/txt</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename=CentrosYAsignaturas.txt</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            <result name="provYcentsOK">/WEB-INF/stats/ProvsYCentros.jsp</result>
+            <result name="provYcentsTxtOK" type="stream">
+                <param name="contentType">application/txt</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename=ProvinciasYCentros.txt</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            <result name="viasAccesoOK">/WEB-INF/stats/ViasAcceso.jsp</result>
+            
+            <result name="resultadosGeneralesAsigFGOK">/WEB-INF/stats/GeneralesAsignaturasFG.jsp</result>
+            <result name="resultadosGeneralesAsigFGTxtOK" type="stream">
+                <param name="contentType">application/txt</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename=GeneralesAsigFG.txt</param>
+                <param name="bufferSize">1024</param>
+            </result>
+
+            <result name="resultadosGeneralesAsigFEOK">/WEB-INF/stats/GeneralesAsignaturasFE.jsp</result>
+            <result name="resultadosGeneralesAsigFETxtOK" type="stream">
+                <param name="contentType">application/txt</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename=GeneralesAsigFE.txt</param>
+                <param name="bufferSize">1024</param>
+            </result>
+
+            <result name="resultadosGeneralesCentrosOK">/WEB-INF/stats/GeneralesCentrosFG.jsp</result>
+            <result name="resultadosGeneralesFasesOK">/WEB-INF/stats/GeneralesFases.jsp</result>
+            <result name="cuadranteFEOK" type="stream">
+                <param name="contentType">application/pdf</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">inline</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            <result name="cuadranteOK" type="stream">
+                <param name="contentType">application/pdf</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">inline</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            <result type="stream">
+                <param name="contentType">application/excel</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentDisposition">attachment;filename=${filename}</param>
+                <param name="bufferSize">1024</param>
+            </result>
+            <result name="sinPermiso">/WEB-INF/jsp/errorSinPermiso.jsp</result>
+            <result name="grabaNotasOK">/WEB-INF/stats/SegundaGrabacionIden.jsp</result>
+        </action>
+    </package>
+</struts>
+
