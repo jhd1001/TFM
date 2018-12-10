@@ -20,10 +20,10 @@
 
             </div>
             <div id="contenido-unico">
-                <s:form action="login.action" method="POST" namespace="/">
+                <s:form action="login" method="POST" namespace="/">
                     <s:textfield name="url" key="URL"/>
                     <s:textfield name="usuario" key="Usuario"/>
-                    <s:textfield name="password" key="Contrasena"/>
+                    <s:password name="password" key="Contrasena"/>
                     <s:submit key="Conectar"/>
                 </s:form>
             </div>

@@ -7,13 +7,19 @@
     <constant name="struts.devMode" value="false" />
 
     <package name="basicstruts2" extends="struts-default" namespace="/">
-        <action name="validarLogin" class="es.ubu.alu.mydatabasejc.actions.Login" method="validarLogin">
+        <global-results>
+            <result name="input">/login.jsp</result>
+        </global-results>
+        <action name="validarLogin" class="es.ubu.alu.mydatabasejc.actions.LoginAction" method="validarLogin">
             <result name="error">/login.jsp</result>
-            <result>/inicio.jsp</result>
+            <result>/inicial.jsp</result>
         </action>
-        <action name="login" class="es.ubu.alu.mydatabasejc.actions.Login" method="login">
+        <action name="login" class="es.ubu.alu.mydatabasejc.actions.LoginAction" method="login">
             <result name="error">/login.jsp</result>
-            <result>/inicio.jsp</result>
+            <result>/inicial.jsp</result>
+        </action>
+        <action name="logear" class="es.ubu.alu.mydatabasejc.actions.LoginAction" method="logear">
+            <result>/login.jsp</result>
         </action>
     </package>
 
