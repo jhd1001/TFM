@@ -11,32 +11,41 @@ import es.ubu.alu.mydatabasejc.exceptions.DatabaseMetaDataException;
 import es.ubu.alu.mydatabasejc.jdbc.ConnectionImpl;
 import es.ubu.alu.mydatabasejc.jdbc.ConnectionInfo;
 import es.ubu.alu.mydatabasejc.jdbc.DatabaseMetaDataImpl;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.struts2.ServletActionContext;
+import org.apache.struts2.interceptor.SessionAware;
 
 /**
  *
  * @author jhuidobro
  */
-public class ConsultaAction extends LoginAction implements Preparable {
+public class ConsultaAction extends LoginAction implements Preparable, SessionAware {
 
     private ConnectionImpl connectionImpl;
     private List<PropiedadValor> listInfo;
     private List<PropiedadValor> listMenu;
     private String metodo;
     private List<List> listResultSet;
+    private String parametros;
+    private Map<String, Object> sesion;
     
     public String resultset() {
         // Si metodo no contiene ningún valor, error
@@ -45,9 +54,9 @@ public class ConsultaAction extends LoginAction implements Preparable {
             return ERROR;
         }
         try {
-            ResultSet rs = getResultSet(connectionImpl.getConnection().getMetaData(), metodo);
+            ResultSet rs = getResultSet(connectionImpl.getConnection().getMetaData(), metodo, parametros);
             listResultSet = getListResultSet(rs);
-        } catch (SQLException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | DatabaseMetaDataException ex) {
+        } catch (SQLException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | IOException | ClassNotFoundException | DatabaseMetaDataException ex) {
             addActionError(ex.getMessage());
             return ERROR;
         }
@@ -58,7 +67,9 @@ public class ConsultaAction extends LoginAction implements Preparable {
      * Ejecuta el método del objeto databaseMetaData indicado. Devuelve el resultset
      * resultado de la ejecución.
      * @param databaseMetaData
-     * @param metodo
+     * @param metodo Nombre del método a invocar
+     * @param parametros Array de clases que conforman los parámetros del método
+     * codificado en Base64
      * @return
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
@@ -67,17 +78,34 @@ public class ConsultaAction extends LoginAction implements Preparable {
      * @throws DatabaseMetaDataException Si el resultado de la ejecución del método
      * no produce un objeto de tipo ResultSet se genera una excepción de este tipo
      */
-    private ResultSet getResultSet(DatabaseMetaData databaseMetaData, String metodo) throws IllegalAccessException, IllegalArgumentException, NoSuchMethodException, InvocationTargetException, DatabaseMetaDataException {
+    private ResultSet getResultSet(DatabaseMetaData databaseMetaData, String metodo, String parametros) throws IllegalAccessException, IllegalArgumentException, NoSuchMethodException, InvocationTargetException, DatabaseMetaDataException, IOException, ClassNotFoundException {
         // Obtiene el objeto DatabaseMetaDataImpl
         DatabaseMetaDataImpl dbMetadata = new DatabaseMetaDataImpl(databaseMetaData);
-        // Se invoca el método solicitado
-        Method method = DatabaseMetaDataImpl.class.getMethod(metodo, null);
-        Object o = method.invoke(dbMetadata, new Object[]{});
+        // se decodifica y obtiene el array de bytes que forman los parámetros del métod
+        ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decodeBase64(parametros));
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        // se obtiene el array de parámetros a partir de los datos obtenidos
+        Class[] parameterTypes = (Class[])ois.readObject();
+        // Se invoca el método solicitado, con los parámetros calculados
+        Method method = DatabaseMetaDataImpl.class.getMethod(metodo, parameterTypes);
+        // Obtiene los nombres de los parametros
+        Parameter[] arrayParametros = method.getParameters();
+        // crea una lista de objetos que serán finalmente los parametros a pasar al metodo invocado
+        List<Object> listaParametros = new ArrayList<>();
+        // busca cada parametro en la sesión del usuario
+        for (Parameter parametro : arrayParametros) {
+            // y lo asigna a la lista de objetos a pasar
+            listaParametros.add(sesion.get(parametro.getName()));
+        }
+        // Obtiene la lista de objetos en forma de array. Serán los argumentos de 
+        // la función invocada
+        Object[] args = listaParametros.toArray();
+        // e invoca al método pasandole los argumentos necesarios
+        Object o = method.invoke(dbMetadata, args);
         if (!(o instanceof ResultSet)) {
             throw new DatabaseMetaDataException("El.objeto.obtenido.no.es.del.tipo.adecuado", metodo);
         }
         return (ResultSet)o;
-        
     }
     /**
      * Obtiene en una List<List> el resultset recibido. El primer elemento de
@@ -123,25 +151,17 @@ public class ConsultaAction extends LoginAction implements Preparable {
             if (method.getReturnType()==ResultSet.class) {
                 ObjectOutputStream os = null;
                 try {
-System.out.println("1");
-                    // crea el metodo/valor. La propiedad es el nombre del método
-                    // y el valor es el resultado de la ejecución del método
+                    // instancia el array de parámetros del método
                     Class[] parametros = method.getParameterTypes();
-System.out.println("2");
+                    // lo escribe en un outputstream
                     ByteArrayOutputStream bs = new ByteArrayOutputStream();
-System.out.println("3");
-                    //Base64OutputStream b64os = new Base64OutputStream(bs);
                     os = new ObjectOutputStream(bs);
-System.out.println("4");
-                    //ObjectOutputStream os = new ObjectOutputStream(b64os);
                     os.writeObject(parametros);
-System.out.println("5");
-                    byte[] bsArray = bs.toByteArray();
-System.out.println("5.1");
-                    String params = Base64.encodeBase64URLSafeString(bsArray);
-System.out.println("6");
+                    // y lo codifica en base 64 para ser enviado en una URL
+                    String params = Base64.encodeBase64URLSafeString(bs.toByteArray());
+                    // crea el metodo/valor. La propiedad es el nombre del método
+                    // y el valor es el array de parámetros
                     PropiedadValor p = new PropiedadValor(method.getName(), params);
-System.out.println("7");
                     // lo busca en la lista
                     if ((index = listMenu.indexOf(p))==-1) {
                         // y lo añade el nombre del método a la lista si no existe aún
@@ -196,6 +216,11 @@ System.out.println("7");
         return SUCCESS;
     }
 
+    @Override
+    public void setSession(Map<String, Object> map) {
+        this.sesion = map;
+    }
+    
     /**
      * Se obtiene la conexión de la sesión del usuario
      *
@@ -203,8 +228,7 @@ System.out.println("7");
      */
     @Override
     public void prepare() throws Exception {
-        HttpServletRequest request = ServletActionContext.getRequest();
-        connectionImpl = (ConnectionImpl) request.getSession().getAttribute("conexion");
+        connectionImpl = (ConnectionImpl) sesion.get("conexion");
     }
 
     public ConnectionImpl getConnectionImpl() {return connectionImpl;}
@@ -224,5 +248,9 @@ System.out.println("7");
     public List<List> getListResultSet() {return listResultSet;}
 
     public void setListResultSet(List<List> listResultSet) {this.listResultSet = listResultSet;}
-    
+
+    public String getParametros() {return parametros;}
+
+    public void setParametros(String parametros) {this.parametros = parametros;}
+
 }
