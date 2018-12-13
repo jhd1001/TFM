@@ -20,6 +20,8 @@
 
             </div>
             <div id="contenido-unico">
+                <s:actionerror/>
+                <s:actionmessage/>
                 <s:form action="login" method="POST" namespace="/">
                     <s:textfield name="url" key="URL"/>
                     <s:textfield name="usuario" key="Usuario"/>

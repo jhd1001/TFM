@@ -35,8 +35,7 @@
                     <s:iterator value="listMenu">
                         <li>
                             <s:url action="resultset" var="urlTag">
-                                <s:param name="metodo"><s:property value="propiedad"/></s:param>
-                                <s:param name="parametros"><s:property value="valor"/></s:param>
+                                <s:param name="%{valor}"><s:property value="propiedad"/></s:param>
                             </s:url>
                             <s:a href="%{urlTag}"><s:property value="%{getText(propiedad)}"/></s:a>
                             </li>
@@ -48,20 +47,17 @@
                 <s:actionmessage/>
                 <h1>INICIAL</h1>
                 <table class="tabla">
-                    <tr>
-                        <th>Propiedad</th>
-                        <th>Valor</th>
-                    </tr>
-                    <s:iterator value="listInfo">
+                    <s:iterator value="listResultSet" var="record" status="status">
                         <tr>
-                            <td>
-                                <%--<s:i18n name="es.ubu.alu.mydatabasejc.connectionInfo">--%>
-                                <s:property value="%{getText(propiedad)}"/>
-                                <%--</s:i18n>--%>
-                            </td>
-                            <td><s:property value="valor"/></td>
-                        </tr>
-                    </s:iterator>
+                            <s:iterator value="#record">
+                                <s:if test="#status.first == true">
+                                    <th><s:property /></th>
+                                </s:if>
+                                <s:else>
+                                    <td><s:property /></td>
+                                </s:else>
+                            </s:iterator>
+                        </s:iterator>
                 </table>
             </div>
         </div>

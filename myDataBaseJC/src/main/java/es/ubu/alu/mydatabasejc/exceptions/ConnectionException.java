@@ -6,6 +6,7 @@
 package es.ubu.alu.mydatabasejc.exceptions;
 
 import es.ubu.alu.mydatabasejc.jdbc.ConnectionImpl;
+import java.sql.SQLException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
@@ -27,6 +28,7 @@ public class ConnectionException extends Throwable {
      * message.
      */
     public ConnectionException() {
+        super();
     }
 
     /**

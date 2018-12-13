@@ -7,8 +7,11 @@ package es.ubu.alu.mydatabasejc.jdbc;
 
 import es.ubu.alu.mydatabasejc.exceptions.ConnectionException;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -20,7 +23,29 @@ public class ConnectionImpl {
     private String usuario;
     private String password;
     private String driver;
-    
+    /*
+    public DatabaseMetaData getMetaData() {
+        try {
+            return connection.getMetaData();
+        } catch (SQLException ex) {
+            new ConnectionException(ex, this);
+            return null;
+        }
+    }
+    */
+    /**
+     * Cierra la conexión si estuviera establecida
+     */
+    public void close() {
+        try {
+            connection.close();
+        } catch (SQLException ex) {
+            ;
+        } finally {
+            connection = null;
+            return;
+        }
+    }
     /**
      * Instancia un objeto de la clase ConnectionImpl
      * @param url URL de conexión a la base de datos
@@ -119,5 +144,9 @@ public class ConnectionImpl {
     public Connection getConnection() {return connection;}
 
     public void setConnection(Connection connection) {this.connection = connection;}
+
+    public String getDriver() {return driver;}
+
+    public void setDriver(String driver) {this.driver = driver;}
     
 }

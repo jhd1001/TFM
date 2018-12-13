@@ -51,14 +51,26 @@ public class LoginAction extends ActionSupport {
         // control de validez de sesión iniciada
         HttpServletRequest request = ServletActionContext.getRequest();
         if (request.getSession().isNew()) return ERROR;
+        ConnectionImpl connectionImpl = (ConnectionImpl)request.getSession().getAttribute("conexion");
         
+        return validarLogin(connectionImpl);
+    }
+    
+    /**
+     * Se valida el intento de login. Si se produce un error en una conexión
+     * previamente establecida, se intentará realizar de nuevo la conexión
+     * con los datos previos mediante llamada al método login()
+     * @return "error" si no se puede validar el login
+     * "success" en caso de que el login se haya validado correctametne
+     * @param connectionImpl Objeto que se debe validar
+     */
+    protected String validarLogin(ConnectionImpl connectionImpl) {
         // Conexion no establecida
-        if (request.getSession().getAttribute("conexion")==null) {
+        if (connectionImpl==null) {
             addActionError("Conexión no realizada");
             return ERROR;
         }
         
-        ConnectionImpl connectionImpl = (ConnectionImpl)request.getSession().getAttribute("conexion");
         // si la conexión se ha cerrado, se intenta establecer nuevamente
         if (connectionImpl.isClosed()) 
             return login(
@@ -121,5 +133,5 @@ public class LoginAction extends ActionSupport {
     public String getPassword() {return password;}
 
     public void setPassword(String password) {this.password = password;}
-    
+
 }

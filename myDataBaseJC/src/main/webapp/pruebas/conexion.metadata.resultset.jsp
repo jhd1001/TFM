@@ -30,6 +30,7 @@
                 for (int i = 0; i < metodos.length; i++) {
                     if (metodos[i].getDeclaringClass().equals(metaData.getClass())) {
                         Type[] tipos = metodos[i].getGenericParameterTypes();
+                        Class[] argc = metodos[i].getParameterTypes();
                         Parameter[] parameters = metodos[i].getParameters();
             %>
             <tr>
