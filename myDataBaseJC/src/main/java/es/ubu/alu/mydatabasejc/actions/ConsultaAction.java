@@ -6,8 +6,11 @@
 package es.ubu.alu.mydatabasejc.actions;
 
 import com.opensymphony.xwork2.Preparable;
+import es.ubu.alu.mydatabasejc.Menu;
 import es.ubu.alu.mydatabasejc.PropiedadValor;
+import es.ubu.alu.mydatabasejc.ValoresPorDefecto;
 import es.ubu.alu.mydatabasejc.exceptions.DatabaseMetaDataException;
+import es.ubu.alu.mydatabasejc.exceptions.ResultSetException;
 import es.ubu.alu.mydatabasejc.jdbc.ConnectionImpl;
 import es.ubu.alu.mydatabasejc.jdbc.ConnectionInfo;
 import es.ubu.alu.mydatabasejc.jdbc.DatabaseMetaDataImpl;
@@ -26,11 +29,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.interceptor.SessionAware;
 
 /**
@@ -46,6 +45,7 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
     private List<List> listResultSet;
     private String parametros;
     private Map<String, Object> sesion;
+    private List<Menu> menus;
     
     public String resultset() {
         // Si metodo no contiene ningún valor, error
@@ -53,10 +53,12 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
             addActionError("Llamada.a.la.accion.resultset.incorrecta");
             return ERROR;
         }
+        ResultSet rs = null;
         try {
-            ResultSet rs = getResultSet(connectionImpl.getConnection().getMetaData(), metodo, parametros);
+            rs = getResultSet(connectionImpl.getConnection().getMetaData(), metodo, parametros);
             listResultSet = getListResultSet(rs);
-        } catch (SQLException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | IOException | ClassNotFoundException | DatabaseMetaDataException ex) {
+        } catch (ResultSetException | SQLException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | IOException | ClassNotFoundException | DatabaseMetaDataException ex) {
+            try {if (rs!=null) rs.close();} catch (SQLException ex1) {;}
             addActionError(ex.getMessage());
             return ERROR;
         }
@@ -114,7 +116,7 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
      * @return
      * @throws SQLException 
      */
-    private List<List> getListResultSet(ResultSet resultSet) throws SQLException {
+    private List<List> getListResultSet(ResultSet resultSet) throws SQLException, ResultSetException {
         List<List> lista = new ArrayList();
         // se obtiene el metadata del result set
         ResultSetMetaData rsMetadata = resultSet.getMetaData();
@@ -129,7 +131,11 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
             
         // para cada registro del resultset se añade una lista con sus valores
         // a la lista del resultset
+        int n = 1;
         while (resultSet.next()) {
+            // si se supera el máximo de registros, se manda error
+            if (n++>ValoresPorDefecto.numMaxRecords)
+                throw new ResultSetException("Demasiados.registros.Filtrar", resultSet);
             List record = new ArrayList();
             for (int j = 1; j < i; j++)
                 record.add(resultSet.getObject(j));
@@ -179,6 +185,49 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
             }
         }
         return listMenu;
+    }
+
+    public List<Menu> getMenus() { //throws IOException {
+        // inicia la lista de valores del menu
+        menus = new ArrayList<>();
+        // A continuación obtiene los métodos de la MetaData que devuelven
+        // objetos de tipo ResultSet que serán añadidos como opciones de menú
+        Method[] methods = DatabaseMetaDataImpl.class.getMethods();
+        int index;
+        // para cada método
+        for (Method method : methods) {
+            // solo si el método retorna un tipo ResultSet
+            if (method.getReturnType()==ResultSet.class) {
+                ObjectOutputStream os = null;
+                try {
+                    // instancia el array de parámetros del método
+                    Class[] parametros = method.getParameterTypes();
+                    // lo escribe en un outputstream
+                    ByteArrayOutputStream bs = new ByteArrayOutputStream();
+                    os = new ObjectOutputStream(bs);
+                    os.writeObject(parametros);
+                    // y lo codifica en base 64 para ser enviado en una URL
+                    String params = Base64.encodeBase64URLSafeString(bs.toByteArray());
+                    // crea el metodo/valor. La propiedad es el nombre del método
+                    // y el valor es el array de parámetros
+                    Menu menu = new Menu("propio",method.getName(), params);
+                    // lo busca en la lista
+                    if ((index = menus.indexOf(menu))==-1) {
+                        // y lo añade el nombre del método a la lista si no existe aún
+                        menus.add(menu);
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                } finally {
+                    try {
+                        os.close();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
+        return menus;
     }
 
     /**
@@ -252,5 +301,7 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
     public String getParametros() {return parametros;}
 
     public void setParametros(String parametros) {this.parametros = parametros;}
+
+    public void setMenus(List<Menu> menus) {this.menus = menus;}
 
 }

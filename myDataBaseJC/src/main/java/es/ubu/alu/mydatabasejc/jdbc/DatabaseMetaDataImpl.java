@@ -5,6 +5,7 @@
  */
 package es.ubu.alu.mydatabasejc.jdbc;
 
+import alu.ubu.es.mydatabasejc.actions.MetaDataInfoCategorias;
 import es.ubu.alu.mydatabasejc.PropiedadValor;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -23,44 +24,58 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
     protected DatabaseMetaData metadata;
 
+    private Method[] getMetodos(String categoria) {
+        // crea una lista de almacenamiento temporal
+        List<Method> lista = new ArrayList<Method>();
+        // obtiene todos los métodos
+        Method[] methods = this.getClass().getMethods();
+        // Para cada método
+        for (int i = 0; i < methods.length; i++) {
+            // obtiene la anotación del tipo adecuado de cada método
+            MetaDataInfoCategorias anotacion = methods[i].getAnnotation(MetaDataInfoCategorias.class);
+            // si no existe la anotación, pasa al siguiente método
+            if (anotacion==null) continue;
+            // si existe y es de la categoría buscada, se añade a la lista temporal de métodos
+            if (anotacion.categoria().equals(categoria))
+                lista.add(methods[i]);
+        }
+        Method[] m = {};
+        // convierte la lista temporal a array y lo retorna
+        return lista.toArray(m);
+    }
+    
     public DatabaseMetaDataImpl(DatabaseMetaData metadata){
         this.metadata = metadata;
     }
     
     public ResultSet getBasicInfo() {
-        MetaDataBasicInfo metadataBasicInfo = new MetaDataBasicInfo(metadata);
-        Method[] methods = MetaDataBasicInfo.class.getMethods();
-        return getInfo(methods, metadataBasicInfo);
+        Method[] methods = getMetodos("Básica");
+        return getInfo(methods, metadata);
     }
     
     public ResultSet getConnInfo() {
-        MetaDataConnInfo metadataInfo = new MetaDataConnInfo(metadata);
-        Method[] methods = MetaDataConnInfo.class.getMethods();
-        return getInfo(methods, metadataInfo);
+        Method[] methods = getMetodos("Conexion");
+        return getInfo(methods, metadata);
     }
     
     public ResultSet getDataBaseInfo() {
-        MetaDataDataBaseInfo metadataInfo = new MetaDataDataBaseInfo(metadata);
-        Method[] methods = MetaDataDataBaseInfo.class.getMethods();
-        return getInfo(methods, metadataInfo);
+        Method[] methods = getMetodos("Base de datos");
+        return getInfo(methods, metadata);
     }
     
     public ResultSet getDataInfo() {
-        MetaDataDataInfo metadataInfo = new MetaDataDataInfo(metadata);
-        Method[] methods = MetaDataDataInfo.class.getMethods();
-        return getInfo(methods, metadataInfo);
+        Method[] methods = getMetodos("Datos");
+        return getInfo(methods, metadata);
     }
     
     public ResultSet getUserInfo() {
-        MetaDataUserInfo metadataInfo = new MetaDataUserInfo(metadata);
-        Method[] methods = MetaDataUserInfo.class.getMethods();
-        return getInfo(methods, metadataInfo);
+        Method[] methods = getMetodos("Usuario");
+        return getInfo(methods, metadata);
     }
     
     public ResultSet getSQLInfo() {
-        MetaDataSQLInfo metadataInfo = new MetaDataSQLInfo(metadata);
-        Method[] methods = MetaDataSQLInfo.class.getMethods();
-        return getInfo(methods, metadataInfo);
+        Method[] methods = getMetodos("SQL");
+        return getInfo(methods, metadata);
     }
     
     private ResultSet getInfo(Method[] methods, Object metadataInfo) {
@@ -77,15 +92,18 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
                 listPropValor.add(new PropiedadValor(method.getName(), o));
             }
         }
+System.out.println("Resultados: " + listPropValor.size());
         return new ResultSetImpl(listPropValor);
     }
     
     @Override
+    @MetaDataInfoCategorias(categoria = "Usuario")
     public boolean allProceduresAreCallable() throws SQLException {
         return metadata.allProceduresAreCallable();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Usuario")
     public boolean allTablesAreSelectable() throws SQLException {
         return metadata.allTablesAreSelectable();
     }
@@ -96,41 +114,49 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Conexión")
     public String getUserName() throws SQLException {
         return metadata.getUserName();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Conexión")
     public boolean isReadOnly() throws SQLException {
         return metadata.isReadOnly();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Datos")
     public boolean nullsAreSortedHigh() throws SQLException {
         return metadata.nullsAreSortedHigh();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Datos")
     public boolean nullsAreSortedLow() throws SQLException {
         return metadata.nullsAreSortedLow();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Datos")
     public boolean nullsAreSortedAtStart() throws SQLException {
         return metadata.nullsAreSortedAtStart();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Datos")
     public boolean nullsAreSortedAtEnd() throws SQLException {
         return metadata.nullsAreSortedAtEnd();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Básica")
     public String getDatabaseProductName() throws SQLException {
         return metadata.getDatabaseProductName();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Básica")
     public String getDatabaseProductVersion() throws SQLException {
         return metadata.getDatabaseProductVersion();
     }
@@ -141,26 +167,31 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Conexión")
     public String getDriverVersion() throws SQLException {
         return metadata.getDriverVersion();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Conexión")
     public int getDriverMajorVersion() {
         return metadata.getDriverMajorVersion();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Conexión")
     public int getDriverMinorVersion() {
         return metadata.getDriverMinorVersion();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Base de datos")
     public boolean usesLocalFiles() throws SQLException {
         return metadata.usesLocalFiles();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Base de datos")
     public boolean usesLocalFilePerTable() throws SQLException {
         return metadata.usesLocalFilePerTable();
     }
@@ -171,76 +202,91 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Base de datos")
     public boolean storesUpperCaseIdentifiers() throws SQLException {
         return metadata.storesUpperCaseIdentifiers();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Base de datos")
     public boolean storesLowerCaseIdentifiers() throws SQLException {
         return metadata.storesLowerCaseIdentifiers();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Base de datos")
     public boolean storesMixedCaseIdentifiers() throws SQLException {
         return metadata.storesMixedCaseIdentifiers();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Base de datos")
     public boolean supportsMixedCaseQuotedIdentifiers() throws SQLException {
         return metadata.supportsMixedCaseQuotedIdentifiers();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Base de datos")
     public boolean storesUpperCaseQuotedIdentifiers() throws SQLException {
         return metadata.storesUpperCaseQuotedIdentifiers();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Base de datos")
     public boolean storesLowerCaseQuotedIdentifiers() throws SQLException {
         return metadata.storesLowerCaseQuotedIdentifiers();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Base de datos")
     public boolean storesMixedCaseQuotedIdentifiers() throws SQLException {
         return metadata.storesMixedCaseQuotedIdentifiers();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "SQL")
     public String getIdentifierQuoteString() throws SQLException {
         return metadata.getIdentifierQuoteString();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "SQL")
     public String getSQLKeywords() throws SQLException {
         return metadata.getSQLKeywords();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "SQL")
     public String getNumericFunctions() throws SQLException {
         return metadata.getNumericFunctions();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "SQL")
     public String getStringFunctions() throws SQLException {
         return metadata.getStringFunctions();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "SQL")
     public String getSystemFunctions() throws SQLException {
         return metadata.getSystemFunctions();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "SQL")
     public String getTimeDateFunctions() throws SQLException {
         return metadata.getTimeDateFunctions();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "SQL")
     public String getSearchStringEscape() throws SQLException {
         return metadata.getSearchStringEscape();
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Base de datos")
     public String getExtraNameCharacters() throws SQLException {
         return metadata.getExtraNameCharacters();
     }
@@ -261,6 +307,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
     }
 
     @Override
+    @MetaDataInfoCategorias(categoria = "Datos")
     public boolean nullPlusNonNullIsNull() throws SQLException {
         return metadata.nullPlusNonNullIsNull();
     }
