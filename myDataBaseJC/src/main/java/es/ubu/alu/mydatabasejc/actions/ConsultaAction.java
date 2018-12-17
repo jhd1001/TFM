@@ -210,7 +210,7 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
                     String params = Base64.encodeBase64URLSafeString(bs.toByteArray());
                     // crea el metodo/valor. La propiedad es el nombre del método
                     // y el valor es el array de parámetros
-                    Menu menu = new Menu("propio",method.getName(), params);
+                    Menu menu = new Menu("resultset",method.getName(), params);
                     // lo busca en la lista
                     if ((index = menus.indexOf(menu))==-1) {
                         // y lo añade el nombre del método a la lista si no existe aún

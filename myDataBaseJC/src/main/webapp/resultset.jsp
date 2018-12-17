@@ -28,22 +28,7 @@
                     </tr>
                 </table>
             </div>
-            <div id="menu-lateral">
-                <h1>Menú</h1>
-                Conexión: <s:property value="connectionImpl.connection"/>
-                <ol>
-                    <%--<s:iterator value="listMenu">--%>
-                    <s:iterator value="menus">
-                        <li>
-                            <s:url action="%{action}" var="urlTag">
-                                <s:param name="metodo"><s:property value="metodo"/></s:param>
-                                <s:param name="parametros"><s:property value="parametros"/></s:param>
-                            </s:url>
-                            <s:a href="%{urlTag}"><s:property value="%{getText(metodo)}"/></s:a>
-                            </li>
-                    </s:iterator>
-                </ol>
-            </div>
+            <s:include value="/WEB-INF/jspf/menu.jsp"/>
             <div id="contenido-unico">
                 <s:actionerror/>
                 <s:actionmessage/>
