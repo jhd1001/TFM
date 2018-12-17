@@ -38,7 +38,7 @@
                         <th>Propiedad</th>
                         <th>Valor</th>
                     </tr>
-                    <s:iterator value="listInfo">
+                    <s:iterator value="listInicial">
                         <tr>
                             <td>
                                 <%--<s:i18n name="es.ubu.alu.mydatabasejc.connectionInfo">--%>

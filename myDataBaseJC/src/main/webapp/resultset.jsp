@@ -32,19 +32,32 @@
             <div id="contenido-unico">
                 <s:actionerror/>
                 <s:actionmessage/>
-                <h1>INICIAL</h1>
+                <h1><s:i18n name="es.ubu.alu.mydatabasejc.package"><s:property value="%{getText(metodo)}"/></s:i18n></h1>
+                <h3><s:i18n name="es.ubu.alu.mydatabasejc.help"><s:property value="%{getText(metodo)}"/></s:i18n></h3>
                 <table class="tabla">
-                    <s:iterator value="listResultSet" var="record" status="status">
+                    <s:iterator value="listInfo" var="record" status="status">
                         <tr>
+                            <s:set var="cuenta" value="1"/>
                             <s:iterator value="#record">
+                                <s:set name="propiedad"><s:property /></s:set>
+                                
                                 <s:if test="#status.first == true">
                                     <th><s:property /></th>
                                 </s:if>
                                 <s:else>
-                                    <td><s:property /></td>
+                                    <td>
+                                        <s:if test="#cuenta == 1">
+                                            <s:text name="%{propiedad}"/>
+                                            <s:set var="cuenta" value="2"/>
+                                        </s:if>
+                                        <s:else>
+                                            <s:property />
+                                        </s:else>
+                                    </td>
                                 </s:else>
                             </s:iterator>
-                        </s:iterator>
+                        </tr>
+                    </s:iterator>
                 </table>
             </div>
         </div>

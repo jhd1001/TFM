@@ -42,6 +42,10 @@
             <result>/resultset.jsp</result>
             <result name="error">/resultset.jsp</result>
         </action>
+        <action name="info" class="es.ubu.alu.mydatabasejc.actions.ConsultaAction" method="info">
+            <result>/resultset.jsp</result>
+            <result name="error">/resultset.jsp</result>
+        </action>
     </package>
     <!--include file="accestats.xml"/-->
     <!-- Configuration for the default package. -->

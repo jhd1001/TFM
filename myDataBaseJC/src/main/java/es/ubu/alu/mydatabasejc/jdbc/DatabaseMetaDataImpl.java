@@ -34,68 +34,79 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
             // obtiene la anotación del tipo adecuado de cada método
             MetaDataInfoCategorias anotacion = methods[i].getAnnotation(MetaDataInfoCategorias.class);
             // si no existe la anotación, pasa al siguiente método
-            if (anotacion==null) continue;
+            if (anotacion == null) {
+                continue;
+            }
             // si existe y es de la categoría buscada, se añade a la lista temporal de métodos
-            if (anotacion.categoria().equals(categoria))
+            if (anotacion.categoria().equals(categoria)) {
                 lista.add(methods[i]);
+            }
         }
         Method[] m = {};
         // convierte la lista temporal a array y lo retorna
         return lista.toArray(m);
     }
-    
-    public DatabaseMetaDataImpl(DatabaseMetaData metadata){
+
+    public DatabaseMetaDataImpl(DatabaseMetaData metadata) {
         this.metadata = metadata;
     }
-    
-    public ResultSet getBasicInfo() {
+
+    public List<List> getBasicInfo() {
         Method[] methods = getMetodos("Básica");
-        return getInfo(methods, metadata);
+        return getInfo(methods);
     }
-    
-    public ResultSet getConnInfo() {
-        Method[] methods = getMetodos("Conexion");
-        return getInfo(methods, metadata);
+
+    public List<List> getConnInfo() {
+        Method[] methods = getMetodos("Conexión");
+        return getInfo(methods);
     }
-    
-    public ResultSet getDataBaseInfo() {
+
+    public List<List> getDataBaseInfo() {
         Method[] methods = getMetodos("Base de datos");
-        return getInfo(methods, metadata);
+        return getInfo(methods);
     }
-    
-    public ResultSet getDataInfo() {
+
+    public List<List> getDataInfo() {
         Method[] methods = getMetodos("Datos");
-        return getInfo(methods, metadata);
+        return getInfo(methods);
     }
-    
-    public ResultSet getUserInfo() {
+
+    public List<List> getUserInfo() {
         Method[] methods = getMetodos("Usuario");
-        return getInfo(methods, metadata);
+        return getInfo(methods);
     }
-    
-    public ResultSet getSQLInfo() {
+
+    public List<List> getSQLInfo() {
         Method[] methods = getMetodos("SQL");
-        return getInfo(methods, metadata);
+        return getInfo(methods);
     }
-    
-    private ResultSet getInfo(Method[] methods, Object metadataInfo) {
-        List<PropiedadValor> listPropValor = new ArrayList<PropiedadValor>();
+
+    private List<List> getInfo(Method[] methods) {
+        // crea la lista
+        List<List> lista = new ArrayList();
+        // crea la cabecera
+        List cabecera = new ArrayList();
+        cabecera.add("Propiedad");
+        cabecera.add("Valor");
+        // y la añade a la lista
+        lista.add(cabecera);
+
         // para cada método
         for (Method method : methods) {
-            if (method.getDeclaringClass().equals(metadataInfo.getClass())) {
-                Object o = null;
-                try {
-                    o = method.invoke(metadataInfo, new Object[]{});
-                } catch (Exception e) {
-                    o = e.getLocalizedMessage();
-                }
-                listPropValor.add(new PropiedadValor(method.getName(), o));
+            Object o = null;
+            try {
+                o = method.invoke(this, new Object[]{});
+            } catch (Exception e) {
+                o = e.getLocalizedMessage();
             }
+            List registro = new ArrayList();
+            registro.add(method.getName());
+            registro.add(o);
+            lista.add(registro);
         }
-System.out.println("Resultados: " + listPropValor.size());
-        return new ResultSetImpl(listPropValor);
+        return lista;
     }
-    
+
     @Override
     @MetaDataInfoCategorias(categoria = "Usuario")
     public boolean allProceduresAreCallable() throws SQLException {
@@ -1006,5 +1017,5 @@ System.out.println("Resultados: " + listPropValor.size());
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return metadata.isWrapperFor(iface);
     }
-    
+
 }

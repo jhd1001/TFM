@@ -29,6 +29,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.struts2.interceptor.SessionAware;
 
@@ -39,14 +41,29 @@ import org.apache.struts2.interceptor.SessionAware;
 public class ConsultaAction extends LoginAction implements Preparable, SessionAware {
 
     private ConnectionImpl connectionImpl;
-    private List<PropiedadValor> listInfo;
-    private List<PropiedadValor> listMenu;
+    private List<PropiedadValor> listInicial;
     private String metodo;
-    private List<List> listResultSet;
+    private List<List> listInfo;
     private String parametros;
     private Map<String, Object> sesion;
     private List<Menu> menus;
     
+    public String info() {
+        // Si metodo no contiene ningún valor, error
+        if (metodo==null || metodo.length()==0) {
+            addActionError("Llamada.a.la.accion.resultset.incorrecta");
+            return ERROR;
+        }
+        try {
+            listInfo = (List<List>)getInvoke(connectionImpl.getConnection().getMetaData(), metodo, parametros);
+            
+        } catch (SQLException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | IOException | ClassNotFoundException | DatabaseMetaDataException ex) {
+            addActionError(ex.getMessage());
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
     public String resultset() {
         // Si metodo no contiene ningún valor, error
         if (metodo==null || metodo.length()==0) {
@@ -55,8 +72,8 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
         }
         ResultSet rs = null;
         try {
-            rs = getResultSet(connectionImpl.getConnection().getMetaData(), metodo, parametros);
-            listResultSet = getListResultSet(rs);
+            rs = (ResultSet)getInvoke(connectionImpl.getConnection().getMetaData(), metodo, parametros);
+            listInfo = getListInfo(rs);
         } catch (ResultSetException | SQLException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | IOException | ClassNotFoundException | DatabaseMetaDataException ex) {
             try {if (rs!=null) rs.close();} catch (SQLException ex1) {;}
             addActionError(ex.getMessage());
@@ -80,7 +97,7 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
      * @throws DatabaseMetaDataException Si el resultado de la ejecución del método
      * no produce un objeto de tipo ResultSet se genera una excepción de este tipo
      */
-    private ResultSet getResultSet(DatabaseMetaData databaseMetaData, String metodo, String parametros) throws IllegalAccessException, IllegalArgumentException, NoSuchMethodException, InvocationTargetException, DatabaseMetaDataException, IOException, ClassNotFoundException {
+    private Object getInvoke(DatabaseMetaData databaseMetaData, String metodo, String parametros) throws IllegalAccessException, IllegalArgumentException, NoSuchMethodException, InvocationTargetException, DatabaseMetaDataException, IOException, ClassNotFoundException {
         // Obtiene el objeto DatabaseMetaDataImpl
         DatabaseMetaDataImpl dbMetadata = new DatabaseMetaDataImpl(databaseMetaData);
         // se decodifica y obtiene el array de bytes que forman los parámetros del métod
@@ -104,11 +121,11 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
         Object[] args = listaParametros.toArray();
         // e invoca al método pasandole los argumentos necesarios
         Object o = method.invoke(dbMetadata, args);
-        if (!(o instanceof ResultSet)) {
-            throw new DatabaseMetaDataException("El.objeto.obtenido.no.es.del.tipo.adecuado", metodo);
-        }
-        return (ResultSet)o;
+        if (o instanceof ResultSet) return (ResultSet)o;
+        if (o instanceof List) return (List<List>)o;
+        throw new DatabaseMetaDataException("El.objeto.obtenido.no.es.del.tipo.adecuado", metodo);
     }
+    
     /**
      * Obtiene en una List<List> el resultset recibido. El primer elemento de
      * la lista representa los nombres de los campos del resultset subyacente
@@ -116,7 +133,7 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
      * @return
      * @throws SQLException 
      */
-    private List<List> getListResultSet(ResultSet resultSet) throws SQLException, ResultSetException {
+    private List<List> getListInfo(ResultSet resultSet) throws SQLException, ResultSetException {
         List<List> lista = new ArrayList();
         // se obtiene el metadata del result set
         ResultSetMetaData rsMetadata = resultSet.getMetaData();
@@ -144,49 +161,6 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
         return lista;
     }
     
-    public List<PropiedadValor> getListMenu() { //throws IOException {
-        // inicia la lista de valores del menu
-        listMenu = new ArrayList<>();
-        // A continuación obtiene los métodos de la MetaData que devuelven
-        // objetos de tipo ResultSet que serán añadidos como opciones de menú
-        Method[] methods = DatabaseMetaDataImpl.class.getMethods();
-        int index;
-        // para cada método
-        for (Method method : methods) {
-            // solo si el método retorna un tipo ResultSet
-            if (method.getReturnType()==ResultSet.class) {
-                ObjectOutputStream os = null;
-                try {
-                    // instancia el array de parámetros del método
-                    Class[] parametros = method.getParameterTypes();
-                    // lo escribe en un outputstream
-                    ByteArrayOutputStream bs = new ByteArrayOutputStream();
-                    os = new ObjectOutputStream(bs);
-                    os.writeObject(parametros);
-                    // y lo codifica en base 64 para ser enviado en una URL
-                    String params = Base64.encodeBase64URLSafeString(bs.toByteArray());
-                    // crea el metodo/valor. La propiedad es el nombre del método
-                    // y el valor es el array de parámetros
-                    PropiedadValor p = new PropiedadValor(method.getName(), params);
-                    // lo busca en la lista
-                    if ((index = listMenu.indexOf(p))==-1) {
-                        // y lo añade el nombre del método a la lista si no existe aún
-                        listMenu.add(p);
-                    }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                } finally {
-                    try {
-                        os.close();
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
-        }
-        return listMenu;
-    }
-
     public List<Menu> getMenus() { //throws IOException {
         // inicia la lista de valores del menu
         menus = new ArrayList<>();
@@ -197,34 +171,18 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
         // para cada método
         for (Method method : methods) {
             // solo si el método retorna un tipo ResultSet
-            if (method.getReturnType()==ResultSet.class) {
-                ObjectOutputStream os = null;
-                try {
-                    // instancia el array de parámetros del método
-                    Class[] parametros = method.getParameterTypes();
-                    // lo escribe en un outputstream
-                    ByteArrayOutputStream bs = new ByteArrayOutputStream();
-                    os = new ObjectOutputStream(bs);
-                    os.writeObject(parametros);
-                    // y lo codifica en base 64 para ser enviado en una URL
-                    String params = Base64.encodeBase64URLSafeString(bs.toByteArray());
-                    // crea el metodo/valor. La propiedad es el nombre del método
-                    // y el valor es el array de parámetros
-                    Menu menu = new Menu("resultset",method.getName(), params);
+            if (method.getReturnType()==ResultSet.class || 
+                method.getReturnType()==List.class) {
+                    // crea el menu. 
+                    Menu menu = new Menu(
+                            method.getReturnType()==ResultSet.class ? "resultset" : "info",
+                            method.getName(), 
+                            method.getParameterTypes());
                     // lo busca en la lista
                     if ((index = menus.indexOf(menu))==-1) {
                         // y lo añade el nombre del método a la lista si no existe aún
                         menus.add(menu);
                     }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                } finally {
-                    try {
-                        os.close();
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
             }
         }
         return menus;
@@ -242,7 +200,7 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
         // Modela la clase de información de la conexión para su presentación
         ConnectionInfo connectionInfo = new ConnectionInfo(connectionImpl.getConnection());
         // inicia la lista de valores 
-        listInfo = new ArrayList<>();
+        listInicial = new ArrayList<>();
         // obtiene los métodos de la clase
         Method[] methods = ConnectionInfo.class.getMethods();
         // para cada método
@@ -259,7 +217,7 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
                 // y el valor es el resultado de la ejecución del método
                 PropiedadValor p = new PropiedadValor(method.getName(), o);
                 // y lo añade a la lista
-                listInfo.add(p);
+                listInicial.add(p);
             }
         }
         return SUCCESS;
@@ -284,19 +242,17 @@ public class ConsultaAction extends LoginAction implements Preparable, SessionAw
 
     public void setConnectionImpl(ConnectionImpl connectionImpl) {this.connectionImpl = connectionImpl;}
 
-    public List<PropiedadValor> getListInfo() {return listInfo;}
+    public List<PropiedadValor> getListInicial() {return listInicial;}
 
-    public void setListInfo(List<PropiedadValor> listInfo) {this.listInfo = listInfo;}
-
-    public void setListMenu(List<PropiedadValor> listMenu) {this.listMenu = listMenu;}
+    public void setListInicial(List<PropiedadValor> listInicial) {this.listInicial = listInicial;}
 
     public String getMetodo() {return metodo;}
 
     public void setMetodo(String metodo) {this.metodo = metodo;    }
 
-    public List<List> getListResultSet() {return listResultSet;}
+    public List<List> getListInfo() {return listInfo;}
 
-    public void setListResultSet(List<List> listResultSet) {this.listResultSet = listResultSet;}
+    public void setListInfo(List<List> listInfo) {this.listInfo = listInfo;}
 
     public String getParametros() {return parametros;}
 
