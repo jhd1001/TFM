@@ -47,7 +47,41 @@ public class DatabaseMetaDataAction extends LoginAction implements Preparable, S
     private String parametros;
     private Map<String, Object> sesion;
     private List<Menu> menus;
+    Parameter[] arrayParametros; // parametros del método invocado
     
+    public String getParameter(int i) {
+        return (String)sesion.get(arrayParametros[i].getName());
+    }
+    
+    public void setCatalog(String catalog) {
+        sesion.put("catalog", catalog);
+    }
+    
+    public void setSchemaPattern(String schemaPattern) {
+        sesion.put("schemaPattern", schemaPattern);
+    }
+    
+    public List getCamposFiltro() {
+        List camposFiltro = new ArrayList();
+        /*
+        Class[] parameterTypes = {};
+        try {
+            parameterTypes = getParameterTypes(parametros);
+        } catch (ClassNotFoundException | IOException ex) {
+            addActionError(ex.getMessage());
+        }
+        */
+        for (Parameter p : arrayParametros) {
+            camposFiltro.add(p.getName());
+        }
+        return camposFiltro;
+    }
+    
+    /**
+     * Invoca el método de DatabaseMetaData con los parámetros adecuados y forma la 
+     * lista con la información a presentar
+     * @return "success" si no se produce error, "error" en caso contrario
+     */
     public String info() {
         // Si metodo no contiene ningún valor, error
         if (metodo==null || metodo.length()==0) {
@@ -64,6 +98,11 @@ public class DatabaseMetaDataAction extends LoginAction implements Preparable, S
         return SUCCESS;
     }
 
+    /**
+     * Invoca el método de DatabaseMetaData con los parámetros adecuados y forma la 
+     * lista con la información a presentar
+     * @return "success" si no se produce error, "error" en caso contrario
+     */
     public String resultset() {
         // Si metodo no contiene ningún valor, error
         if (metodo==null || metodo.length()==0) {
@@ -82,6 +121,14 @@ public class DatabaseMetaDataAction extends LoginAction implements Preparable, S
         return SUCCESS;
     }
 
+    private Class[] getParameterTypes(String parametros) throws IOException, ClassNotFoundException {
+        // se decodifica y obtiene el array de bytes que forman los parámetros del métod
+        ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decodeBase64(parametros));
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        // se obtiene el array de parámetros a partir de los datos obtenidos
+        return (Class[])ois.readObject();
+    }
+    
     /**
      * Ejecuta el método del objeto databaseMetaData indicado. Devuelve el resultset
      * resultado de la ejecución.
@@ -100,15 +147,10 @@ public class DatabaseMetaDataAction extends LoginAction implements Preparable, S
     private Object getInvoke(DatabaseMetaData databaseMetaData, String metodo, String parametros) throws IllegalAccessException, IllegalArgumentException, NoSuchMethodException, InvocationTargetException, DatabaseMetaDataException, IOException, ClassNotFoundException {
         // Obtiene el objeto DatabaseMetaDataImpl
         DatabaseMetaDataImpl dbMetadata = new DatabaseMetaDataImpl(databaseMetaData);
-        // se decodifica y obtiene el array de bytes que forman los parámetros del métod
-        ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decodeBase64(parametros));
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        // se obtiene el array de parámetros a partir de los datos obtenidos
-        Class[] parameterTypes = (Class[])ois.readObject();
         // Se invoca el método solicitado, con los parámetros calculados
-        Method method = DatabaseMetaDataImpl.class.getMethod(metodo, parameterTypes);
+        Method method = DatabaseMetaDataImpl.class.getMethod(metodo, getParameterTypes(parametros));
         // Obtiene los nombres de los parametros
-        Parameter[] arrayParametros = method.getParameters();
+        arrayParametros = method.getParameters();
         // crea una lista de objetos que serán finalmente los parametros a pasar al metodo invocado
         List<Object> listaParametros = new ArrayList<>();
         // busca cada parametro en la sesión del usuario

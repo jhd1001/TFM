@@ -34,6 +34,7 @@
                 <s:actionmessage/>
                 <h1><s:i18n name="es.ubu.alu.mydatabasejc.package"><s:property value="%{getText(metodo)}"/></s:i18n></h1>
                 <h3><s:i18n name="es.ubu.alu.mydatabasejc.help"><s:property value="%{getText(metodo)}"/></s:i18n></h3>
+                <s:include value="/WEB-INF/jspf/filtro.jsp"/>
                 <table class="tabla">
                     <s:iterator value="listInfo" var="record" status="status">
                         <tr>
