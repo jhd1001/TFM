@@ -18,33 +18,33 @@
             <result name="error">/login.jsp</result>
             <result type="redirectAction">
                 <param name="actionName">inicial</param>
-                <param name="namespace">/consulta</param>
+                <param name="namespace">/DatabaseMetaData</param>
                 <param name="parse">false</param>
             </result>
         </action>
         <action name="logear" class="es.ubu.alu.mydatabasejc.actions.LoginAction" method="logear">
             <result type="redirectAction">
                 <param name="actionName">inicial</param>
-                <param name="namespace">/consulta</param>
+                <param name="namespace">/DatabaseMetaData</param>
                 <param name="parse">false</param>
             </result>
         </action>
     </package>
 
-    <package name="consulta" extends="struts-default" namespace="/consulta">
+    <package name="DatabaseMetaData" extends="struts-default" namespace="/DatabaseMetaData">
         <global-results>
             <result name="input">/login.jsp</result>
         </global-results>
-        <action name="inicial" class="es.ubu.alu.mydatabasejc.actions.ConsultaAction" method="inicial">
+        <action name="inicial" class="es.ubu.alu.mydatabasejc.actions.DatabaseMetaDataAction" method="inicial">
             <result>/inicial.jsp</result>
         </action>
-        <action name="resultset" class="es.ubu.alu.mydatabasejc.actions.ConsultaAction" method="resultset">
-            <result>/resultset.jsp</result>
-            <result name="error">/resultset.jsp</result>
+        <action name="resultset" class="es.ubu.alu.mydatabasejc.actions.DatabaseMetaDataAction" method="resultset">
+            <result>/DatabaseMetaData.jsp</result>
+            <result name="error">/DatabaseMetaData.jsp</result>
         </action>
-        <action name="info" class="es.ubu.alu.mydatabasejc.actions.ConsultaAction" method="info">
-            <result>/resultset.jsp</result>
-            <result name="error">/resultset.jsp</result>
+        <action name="info" class="es.ubu.alu.mydatabasejc.actions.DatabaseMetaDataAction" method="info">
+            <result>/DatabaseMetaData.jsp</result>
+            <result name="error">/DatabaseMetaData.jsp</result>
         </action>
     </package>
     <!--include file="accestats.xml"/-->

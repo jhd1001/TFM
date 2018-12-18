@@ -38,7 +38,7 @@ import org.apache.struts2.interceptor.SessionAware;
  *
  * @author jhuidobro
  */
-public class ConsultaAction extends LoginAction implements Preparable, SessionAware {
+public class DatabaseMetaDataAction extends LoginAction implements Preparable, SessionAware {
 
     private ConnectionImpl connectionImpl;
     private List<PropiedadValor> listInicial;
