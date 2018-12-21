@@ -19,15 +19,12 @@
                 <s:hidden name="parametros"/>
                 <ul>
                     <s:set var="counter" value="0"/>
-                    <s:iterator value="camposFiltro">
+                    <s:iterator value="arrayParametros">
                         <li>
                             <s:set var="filtro"><s:property /></s:set>
                             <s:text name="%{filtro}" />: 
-                            <s:i18n name="es.ubu.alu.mydatabasejc.filtro">
-                                <s:text name="%{filtro}">
-                                    <s:param><s:property value="%{getParameter(#counter)}"/></s:param>
-                                </s:text>
-                            </s:i18n>
+                            <s:hidden name="filtroArgumentos" value="%{filtro}"/>
+                            <s:textfield name="filtroValores" value="%{getParameter(#counter)}"/>
                         </li>
                         <s:set var="counter" value="%{#counter+1}"/>
                     </s:iterator>

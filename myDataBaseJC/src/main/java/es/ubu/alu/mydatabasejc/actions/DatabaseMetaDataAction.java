@@ -48,29 +48,50 @@ public class DatabaseMetaDataAction extends LoginAction implements Preparable, S
     private Map<String, Object> sesion;
     private List<Menu> menus;
     Parameter[] arrayParametros; // parametros del método invocado
-    
-    public String getParameter(int i) {
-        return (String)sesion.get(arrayParametros[i].getName());
-    }
-    
-    public void setCatalog(String catalog) {
-        sesion.put("catalog", catalog);
-    }
-    
-    public void setSchemaPattern(String schemaPattern) {
-        sesion.put("schemaPattern", schemaPattern);
-    }
-    
-    public List getCamposFiltro() {
-        List camposFiltro = new ArrayList();
-        /*
-        Class[] parameterTypes = {};
-        try {
-            parameterTypes = getParameterTypes(parametros);
-        } catch (ClassNotFoundException | IOException ex) {
-            addActionError(ex.getMessage());
+    private String[] filtroArgumentos;
+    private String[] filtroValores;
+
+    /** Obtenidos los tipos de los parámetros, se convierten los valores
+     * recibidos a los tipos correspondientes y se ponen en la sesión para
+     * sucesivas llamadas a este o a otros métodos que usen el mismo
+     * parámetro (con el mismo nombre)
+     * Convierte cada valor de filtroValores al tipo necesario según se indica 
+     * en parameterTypes y lo añade a la sesión del usuario con el nombre 
+     * correspondiente en filtroArgumentos
+     * 
+     * @param parameterTypes Array de clases de los argumentos del método que 
+     * se va a invocar en un momento posterior. Este array marca el orden en el
+     * que se procesan los elementos de filtroArgumentos y de filtroValores
+     */
+    private void setParametrosSesion(Class[] parameterTypes) {
+        if (filtroArgumentos == null || filtroValores == null) return;
+        for (int i = 0; i < parameterTypes.length; i++) {
+            String atributo = filtroArgumentos[i];
+            Object valor = null;
+            if (!"".equals(filtroValores[i]))
+                switch (parameterTypes[i].getName()) {
+                    case "[Ljava.lang.String;": 
+                        String[] valores = filtroValores[i].split(",",0); 
+                        List<String> lvalores = new ArrayList();
+                        for (int j = 0; j< valores.length; j++)
+                            if (!"".equals(valores[j])) lvalores.add(valores[j].trim());
+                        valor = lvalores.toArray(valores);
+                        break;
+                    case "boolean": valor = Boolean.valueOf(filtroValores[i]); break;
+                    case "int": valor = Integer.valueOf(filtroValores[i]); break;
+                    case "short": valor = Short.valueOf(filtroValores[i]); break;
+                    default: valor = filtroValores[i];
+                }
+            sesion.put(atributo, valor);
         }
-        */
+    }
+    
+    public Object getParameter(int i) {
+        return sesion.get(arrayParametros[i].getName());
+    }
+    
+    public List getArrayParametros() {
+        List camposFiltro = new ArrayList();
         for (Parameter p : arrayParametros) {
             camposFiltro.add(p.getName());
         }
@@ -89,8 +110,9 @@ public class DatabaseMetaDataAction extends LoginAction implements Preparable, S
             return ERROR;
         }
         try {
-            listInfo = (List<List>)getInvoke(connectionImpl.getConnection().getMetaData(), metodo, parametros);
-            
+            Class[] parameterTypes = getParameterTypes(parametros);
+            setParametrosSesion(parameterTypes);
+            listInfo = (List<List>)getInvoke(connectionImpl.getConnection().getMetaData(), metodo, parameterTypes);
         } catch (SQLException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | IOException | ClassNotFoundException | DatabaseMetaDataException ex) {
             addActionError(ex.getMessage());
             return ERROR;
@@ -111,7 +133,9 @@ public class DatabaseMetaDataAction extends LoginAction implements Preparable, S
         }
         ResultSet rs = null;
         try {
-            rs = (ResultSet)getInvoke(connectionImpl.getConnection().getMetaData(), metodo, parametros);
+            Class[] parameterTypes = getParameterTypes(parametros);
+            setParametrosSesion(parameterTypes);
+            rs = (ResultSet)getInvoke(connectionImpl.getConnection().getMetaData(), metodo, parameterTypes);
             listInfo = getListInfo(rs);
         } catch (ResultSetException | SQLException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | IOException | ClassNotFoundException | DatabaseMetaDataException ex) {
             try {if (rs!=null) rs.close();} catch (SQLException ex1) {;}
@@ -144,19 +168,22 @@ public class DatabaseMetaDataAction extends LoginAction implements Preparable, S
      * @throws DatabaseMetaDataException Si el resultado de la ejecución del método
      * no produce un objeto de tipo ResultSet se genera una excepción de este tipo
      */
-    private Object getInvoke(DatabaseMetaData databaseMetaData, String metodo, String parametros) throws IllegalAccessException, IllegalArgumentException, NoSuchMethodException, InvocationTargetException, DatabaseMetaDataException, IOException, ClassNotFoundException {
+    private Object getInvoke(DatabaseMetaData databaseMetaData, String metodo, Class[] parameterTypes) throws IllegalAccessException, IllegalArgumentException, NoSuchMethodException, InvocationTargetException, DatabaseMetaDataException, IOException, ClassNotFoundException {
         // Obtiene el objeto DatabaseMetaDataImpl
         DatabaseMetaDataImpl dbMetadata = new DatabaseMetaDataImpl(databaseMetaData);
         // Se invoca el método solicitado, con los parámetros calculados
-        Method method = DatabaseMetaDataImpl.class.getMethod(metodo, getParameterTypes(parametros));
+        Method method = DatabaseMetaDataImpl.class.getMethod(metodo, parameterTypes);
         // Obtiene los nombres de los parametros
         arrayParametros = method.getParameters();
         // crea una lista de objetos que serán finalmente los parametros a pasar al metodo invocado
         List<Object> listaParametros = new ArrayList<>();
         // busca cada parametro en la sesión del usuario
+        int i = 0;
         for (Parameter parametro : arrayParametros) {
             // y lo asigna a la lista de objetos a pasar
-            listaParametros.add(sesion.get(parametro.getName()));
+            Object o = sesion.get(parametro.getName());
+            if (o!=null) if ("".equals(o.toString())) o = null;
+            listaParametros.add(o);
         }
         // Obtiene la lista de objetos en forma de array. Serán los argumentos de 
         // la función invocada
@@ -298,8 +325,12 @@ public class DatabaseMetaDataAction extends LoginAction implements Preparable, S
 
     public String getParametros() {return parametros;}
 
-    public void setParametros(String parametros) {this.parametros = parametros;}
-
     public void setMenus(List<Menu> menus) {this.menus = menus;}
 
+    public void setParametros(String parametros) {this.parametros = parametros;}
+
+    public void setFiltroArgumentos(String[] filtroArgumentos) {this.filtroArgumentos = filtroArgumentos;}
+    
+    public void setFiltroValores(String[] filtroValores) {this.filtroValores = filtroValores;}
+    
 }
