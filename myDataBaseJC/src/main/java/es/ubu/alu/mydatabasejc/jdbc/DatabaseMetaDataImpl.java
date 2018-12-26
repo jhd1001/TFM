@@ -7,6 +7,7 @@ package es.ubu.alu.mydatabasejc.jdbc;
 
 import alu.ubu.es.mydatabasejc.actions.MetaDataInfoCategorias;
 import es.ubu.alu.mydatabasejc.PropiedadValor;
+import es.ubu.alu.mydatabasejc.annotations.MetaDataLink;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -738,7 +739,9 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
         return metadata.getProcedureColumns(catalog, schemaPattern, procedureNamePattern, columnNamePattern);
     }
 
+    
     @Override
+    @MetaDataLink(action = "consulta", namespace = "/tablas", parametros = {"TABLE_SCHEM","TABLE_NAME"}, columnNumber = 3)
     public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException {
         return metadata.getTables(catalog, schemaPattern, tableNamePattern, types);
     }

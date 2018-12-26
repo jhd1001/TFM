@@ -47,6 +47,22 @@
             <result name="error">/DatabaseMetaData.jsp</result>
         </action>
     </package>
+    
+    <package name="tablas" extends="struts-default" namespace="/tablas">
+        <global-results>
+            <result name="input">/login.jsp</result>
+        </global-results>
+        <action name="consulta" class="es.ubu.alu.mydatabasejc.actions.TablasAction" method="consulta">
+            <result>/Tabla.jsp</result>
+            <result name="error">/Tabla.jsp</result>
+            <result name="back" type="redirectAction">
+                <param name="actionName">resultset</param>
+                <param name="namespace">/DatabaseMetaData</param>
+                <param name="metodo">getTables</param>
+                <param name="parametros">rO0ABXVyABJbTGphdmEubGFuZy5DbGFzczurFteuy81amQIAAHhwAAAABHZyABBqYXZhLmxhbmcuU3RyaW5noPCkOHo7s0ICAAB4cHEAfgADcQB-AAN2cgATW0xqYXZhLmxhbmcuU3RyaW5nO63SVufpHXtHAgAAeHA</param>
+            </result>
+        </action>
+    </package>
     <!--include file="accestats.xml"/-->
     <!-- Configuration for the default package. -->
     <!--package name="default" extends="struts-default">

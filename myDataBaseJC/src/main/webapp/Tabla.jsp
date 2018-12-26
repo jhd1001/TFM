@@ -55,61 +55,19 @@
             <div id="contenido-unico">
                 <s:actionerror/>
                 <s:actionmessage/>
-                <h1><s:i18n name="es.ubu.alu.mydatabasejc.package"><s:property value="%{getText(metodo)}"/></s:i18n></h1>
-                <h3><s:i18n name="es.ubu.alu.mydatabasejc.help"><s:property value="%{getText(metodo)}"/></s:i18n></h3>
+                <h1><s:property value="TABLE_NAME"/></h1>
+                <h3><s:property value="TABLE_SCHEM"/></h3>
                 <s:include value="/WEB-INF/jspf/filtro.jsp"/>
                 <table class="tabla">
                     <s:iterator value="listInfo" var="record" status="status">
                         <s:if test="#status.first == true"><thead></s:if>
                                 <tr>
                                 <s:iterator value="#record" status="stat">
-                                    <s:set name="propiedad"><s:property /></s:set>
-
                                     <s:if test="#status.first == true">
-                                        <s:if test="!metodoLink">
                                             <th><s:property /></th>
-                                        </s:if>
-                                        <s:elseif test="#stat.count != 1">
-                                            <th><s:property /></th>
-                                        </s:elseif>
                                     </s:if>
                                     <s:else>
-                                        <s:if test="metodoLink">
-                                            <s:if test="#stat.count == 1">
-                                                    <s:url action="%{linkAction}" namespace="%{linkNamespace}" var="urlTag"/>
-                                                    <s:set var="url"><s:property value="urlTag"/>?<s:property/></s:set>
-                                            </s:if>
-                                            <s:elseif test="#stat.count == 2">
-                                                <td>
-                                                    <s:if test="#stat.count-1 == linkColumnNumber">
-                                                        <s:a href="%{url}" id="ir" ><s:text name="%{propiedad}"/></s:a>
-                                                    </s:if>
-                                                    <s:else>
-                                                        <s:text name="%{propiedad}"/>
-                                                    </s:else>
-                                                </td>
-                                            </s:elseif>
-                                            <s:else>
-                                                <td>
-                                                    <s:if test="#stat.count-1 == linkColumnNumber">
-                                                        <s:a href="%{url}" id="ir" ><s:property/></s:a>
-                                                    </s:if>
-                                                    <s:else>
-                                                        <s:property/>
-                                                    </s:else>
-                                                </td>
-                                            </s:else>
-                                        </s:if>
-                                        <s:elseif test="#stat.count == 1">
-                                            <td>
-                                                <s:text name="%{propiedad}"/>
-                                            </td>
-                                        </s:elseif>
-                                        <s:else>
-                                            <td>
-                                                <s:property/>
-                                            </td>
-                                        </s:else>
+                                            <td><s:property/></td>
                                     </s:else>
                                 </s:iterator>
                             </tr>

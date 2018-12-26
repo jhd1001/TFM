@@ -15,13 +15,11 @@
     <body>
         <div id="filtro">
             <s:form name="filtro" method="POST" theme="simple">
-                <s:hidden name="metodo"/>
-                <s:hidden name="parametros"/>
+                <s:set var="counter" value="0"/>
                 <ul>
-                    <s:set var="counter" value="0"/>
                     <s:iterator value="arrayParametros">
                         <li>
-                            <s:set var="filtro"><s:property /></s:set>
+                            <s:set var="filtro"><s:property/></s:set>
                             <s:text name="%{filtro}" />: 
                             <s:hidden name="filtroArgumentos" value="%{filtro}"/>
                             <s:textfield name="filtroValores" value="%{getParameter(#counter)}"/>
@@ -29,7 +27,13 @@
                         <s:set var="counter" value="%{#counter+1}"/>
                     </s:iterator>
                 </ul>
-                <s:submit name="filtrar"/>
+                <s:if test="#counter != 0">
+                    <s:hidden name="metodo"/>
+                    <s:hidden name="parametros"/>
+                    <s:hidden name="TABLE_SCHEM"/>
+                    <s:hidden name="TABLE_NAME"/>
+                    <s:submit name="filtrar"/>
+                </s:if>
             </s:form>
         </div>
     </body>

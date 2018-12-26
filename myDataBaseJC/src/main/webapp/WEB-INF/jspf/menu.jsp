@@ -19,7 +19,7 @@
             <ol>
                 <s:iterator value="menus">
                     <li>
-                        <s:url action="%{action}" var="urlTag">
+                        <s:url action="%{action}" var="urlTag" namespace="/DatabaseMetaData">
                             <s:param name="metodo"><s:property value="metodo"/></s:param>
                             <s:param name="parametros"><s:property value="parametros"/></s:param>
                         </s:url>
