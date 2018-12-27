@@ -204,7 +204,7 @@ public class DatabaseMetaDataAction extends MenuAction implements Preparable, Se
         Object o = method.invoke(dbMetadata, args);
         if (o instanceof ResultSet) return (ResultSet)o;
         if (o instanceof List) return (List<List>)o;
-        throw new DatabaseMetaDataException("El.objeto.obtenido.no.es.del.tipo.adecuado", metodo);
+        throw new DatabaseMetaDataException(getText("El.objeto.obtenido.no.es.del.tipo.adecuado"), metodo);
     }
     
      /**

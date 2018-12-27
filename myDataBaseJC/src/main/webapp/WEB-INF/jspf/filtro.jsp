@@ -13,28 +13,32 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <div id="filtro">
-            <s:form name="filtro" method="POST" theme="simple">
-                <s:set var="counter" value="0"/>
-                <ul>
-                    <s:iterator value="arrayParametros">
-                        <li>
-                            <s:set var="filtro"><s:property/></s:set>
-                            <s:text name="%{filtro}" />: 
-                            <s:hidden name="filtroArgumentos" value="%{filtro}"/>
-                            <s:textfield name="filtroValores" value="%{getParameter(#counter)}"/>
-                        </li>
-                        <s:set var="counter" value="%{#counter+1}"/>
-                    </s:iterator>
-                </ul>
-                <s:if test="#counter != 0">
+        <div class="centrado" id="filtro-div">
+            <s:if test="arrayParametros.size()!=0">
+            <div class="bordeado">
+            <span>Filtro</span>
+                <s:form name="filtro" method="POST" theme="simple" id="filtro">
+                    <table class="filtro">
+                        <s:iterator value="arrayParametros" status="stat">
+                            <s:if test="#stat.odd == true"><tr id="odd"></s:if>
+                            <!--tr-->
+                                <s:set var="filtro"><s:property/></s:set>
+                                <td>
+                                    <s:text name="%{filtro}" />: 
+                                    <s:hidden name="filtroArgumentos" value="%{filtro}"/>
+                                </td>
+                                <td><s:textfield name="filtroValores" value="%{getParameter(#stat.count-1)}"/></td>
+                            <s:if test="#stat.even == true"></tr></s:if>
+                        </s:iterator>
+                    </table>
                     <s:hidden name="metodo"/>
                     <s:hidden name="parametros"/>
                     <s:hidden name="TABLE_SCHEM"/>
                     <s:hidden name="TABLE_NAME"/>
-                    <s:submit name="filtrar"/>
-                </s:if>
-            </s:form>
+                    <s:submit name="filtrar" value="filtrar"/>
+                </s:form>
+            </div>
+            </s:if>
         </div>
     </body>
 </html>

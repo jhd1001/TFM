@@ -78,7 +78,7 @@ public class MenuAction extends LoginAction implements SessionAware {
         while (resultSet.next()) {
             // si se supera el máximo de registros, se manda error
             if (n++>ValoresPorDefecto.numMaxRecords)
-                throw new ResultSetException("Demasiados.registros.Filtrar", resultSet);
+                throw new ResultSetException(getText("Demasiados.registros.Filtrar"), resultSet);
             List record = new ArrayList();
             String urlParametro = "";
             if (metodoLink) record.add(urlParametro);

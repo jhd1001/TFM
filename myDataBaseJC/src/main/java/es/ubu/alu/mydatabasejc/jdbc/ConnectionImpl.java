@@ -23,16 +23,7 @@ public class ConnectionImpl {
     private String usuario;
     private String password;
     private String driver;
-    /*
-    public DatabaseMetaData getMetaData() {
-        try {
-            return connection.getMetaData();
-        } catch (SQLException ex) {
-            new ConnectionException(ex, this);
-            return null;
-        }
-    }
-    */
+
     /**
      * Cierra la conexión si estuviera establecida
      */
@@ -46,6 +37,7 @@ public class ConnectionImpl {
             return;
         }
     }
+
     /**
      * Instancia un objeto de la clase ConnectionImpl
      * @param url URL de conexión a la base de datos

@@ -12,43 +12,35 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/general.css">
         <title>My DataBase JC</title>
     </head>
     <body>
         <div id="page">
-            <div id="cabecera">
-                <table>
-                    <tr>
-                        <td><s:property value="connectionImpl.url"/></td>
-                        <td><s:property value="connectionImpl.driver"/></td>
-                    </tr>
-                    <tr>
-                        <td><s:property value="connectionImpl.usuario"/></td>
-                        <td>&nbsp;</td>
-                    </tr>
-                </table>
-            </div>
+            <s:include value="/WEB-INF/jspf/cabecera.jsp"/>
             <s:include value="/WEB-INF/jspf/menu.jsp"/>
             <div id="contenido-unico">
                 <s:actionerror/>
                 <s:actionmessage/>
                 <h1>INICIAL</h1>
-                <table class="tabla">
-                    <tr>
-                        <th>Propiedad</th>
-                        <th>Valor</th>
-                    </tr>
-                    <s:iterator value="listInicial">
+                <div class="centrado">
+                    <table class="tabla">
                         <tr>
-                            <td>
-                                <%--<s:i18n name="es.ubu.alu.mydatabasejc.connectionInfo">--%>
-                                <s:property value="%{getText(propiedad)}"/>
-                                <%--</s:i18n>--%>
-                            </td>
-                            <td><s:property value="valor"/></td>
+                            <th>Propiedad</th>
+                            <th>Valor</th>
                         </tr>
-                    </s:iterator>
-                </table>
+                        <s:iterator value="listInicial">
+                            <tr>
+                                <td>
+                                    <%--<s:i18n name="es.ubu.alu.mydatabasejc.connectionInfo">--%>
+                                    <s:property value="%{getText(propiedad)}"/>
+                                    <%--</s:i18n>--%>
+                                </td>
+                                <td><s:property value="valor"/></td>
+                            </tr>
+                        </s:iterator>
+                    </table>
+                </div>
             </div>
         </div>
     </body>

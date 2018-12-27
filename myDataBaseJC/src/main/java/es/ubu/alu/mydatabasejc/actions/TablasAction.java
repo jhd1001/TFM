@@ -30,8 +30,8 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
     private Map<String, Object> sesion;
     private String TABLE_SCHEM;
     private String TABLE_NAME;
+    private String TABLE_TYPE;
     private List<List> listInfo;
-    //private List arrayParametros;
     private Set<String> arrayParametros;
 
     public Object getParameter(int i) {
@@ -243,6 +243,10 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
 
     public void setTABLE_NAME(String TABLE_NAME) {this.TABLE_NAME = TABLE_NAME;}
 
+    public String getTABLE_TYPE() {return TABLE_TYPE;}
+
+    public void setTABLE_TYPE(String TABLE_TYPE) {this.TABLE_TYPE = TABLE_TYPE;}
+
     public List<List> getListInfo() {return listInfo;}
 
     public void setListInfo(List<List> listInfo) {this.listInfo = listInfo;}
@@ -250,5 +254,9 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
     public Set<String> getArrayParametros() {return arrayParametros;}
 
     public void setArrayParametros(Set<String> arrayParametros) {this.arrayParametros = arrayParametros;}
+
+    public ConnectionImpl getConnectionImpl() {return connectionImpl;}
+
+    public void setConnectionImpl(ConnectionImpl connectionImpl) {this.connectionImpl = connectionImpl;}
 
 }
