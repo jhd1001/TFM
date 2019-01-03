@@ -16,7 +16,7 @@ import org.apache.struts2.ServletActionContext;
  * @author jhuidobro
  */
 public class LoginAction extends ActionSupport {
-
+    protected String CONEXION = "conexion";
     private String url;
     private String usuario;
     private String password;
@@ -51,7 +51,7 @@ public class LoginAction extends ActionSupport {
         // control de validez de sesión iniciada
         HttpServletRequest request = ServletActionContext.getRequest();
         if (request.getSession().isNew()) return ERROR;
-        ConnectionImpl connectionImpl = (ConnectionImpl)request.getSession().getAttribute("conexion");
+        ConnectionImpl connectionImpl = (ConnectionImpl)request.getSession().getAttribute(CONEXION);
         
         return validarLogin(connectionImpl);
     }
@@ -67,7 +67,7 @@ public class LoginAction extends ActionSupport {
     protected String validarLogin(ConnectionImpl connectionImpl) {
         // Conexion no establecida
         if (connectionImpl==null) {
-            addActionError("Conexión no realizada");
+            addActionError(getText("Conexión no realizada"));
             return ERROR;
         }
         
@@ -114,7 +114,7 @@ public class LoginAction extends ActionSupport {
             ConnectionImpl connectionImpl = new ConnectionImpl(url, usuario, password);
             // se añade el objeto en la sesión del usuario, si ya existía se cambia
             HttpServletRequest request = ServletActionContext.getRequest();
-            request.getSession().setAttribute("conexion", connectionImpl);
+            request.getSession().setAttribute(CONEXION, connectionImpl);
         } catch (ConnectionException ex) {
             addActionError(ex.getLocalizedMessage());
             return ERROR;

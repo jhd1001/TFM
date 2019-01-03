@@ -1011,6 +1011,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
         return metadata.generatedKeyAlwaysReturned();
     }
 
+    
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
         return metadata.unwrap(iface);

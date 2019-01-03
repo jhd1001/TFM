@@ -17,14 +17,12 @@
     </head>
     <body>
         <div id="page">
-            <div id="cabecera">
-
-            </div>
+            <s:include value="/WEB-INF/jspf/cabecera.jsp"/>
             <div id="contenido-unico">
                 <s:actionerror/>
                 <s:actionmessage/>
                 <div id="filtro-div">
-                    <div class="bordeado">
+                    <div class="bordeado50">
                         <s:form action="login" method="POST" namespace="/" id="filtro">
                             <s:textfield name="url" key="URL"/>
                             <s:textfield name="usuario" key="Usuario"/>

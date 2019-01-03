@@ -4,7 +4,6 @@
     Author     : jhuidobro
 --%>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <%@ taglib prefix="s" uri="/struts-tags" %>
@@ -23,23 +22,66 @@
             <s:include value="/WEB-INF/jspf/cabecera.jsp"/>
             <s:include value="/WEB-INF/jspf/menu.jsp"/>
             <div id="contenido-unico">
-                <s:actionerror/>
-                <s:actionmessage/>
-                <h1><s:text name="%{TABLE_TYPE}"/></h1>
-                <h2><s:property value="TABLE_NAME"/></h2>
-                <h3><s:text name="Esquema"/>: <s:property value="TABLE_SCHEM"/></h3>
+                <div>
+                    <s:actionerror/>
+                    <s:actionmessage/>
+                </div>
+                <div>
+                    <h1><s:text name="%{TABLE_TYPE}"/></h1>
+                    <h2><s:property value="TABLE_NAME"/></h2>
+                    <h3><s:text name="Esquema"/>: <s:property value="TABLE_SCHEM"/></h3>
+                </div>
                 <s:include value="/WEB-INF/jspf/filtro.jsp"/>
                 <div id="resultset">
                     <table class="tabla">
                         <s:iterator value="listInfo" var="record" status="status">
                             <s:if test="#status.first == true"><thead></s:if>
-                                    <tr>
+                                <tr onmouseover='$(this).children("td").children("ul.bqY").removeClass("ocultar")' 
+                                    onmouseout='$(this).children("td").children("ul.bqY").addClass("ocultar")'>
                                     <s:iterator value="#record" status="stat">
-                                        <s:if test="#status.first == true">
-                                                <th><s:property /></th>
+                                        <!-- primera columna -->
+                                        <s:if test="#stat.first == true && metodoLink">
+                                            <!-- primera fila -->
+                                            <s:if test="#status.first == true">
+                                                <th><s:text name=""/></th>
+                                            </s:if>
+                                            <!-- resto de filas -->
+                                            <s:else>
+                                                <td>
+                                                    <ul class="bqY ocultar">
+                                                        <%--<li class="bqX brq" data-tooltip="Archivar" jsaction="JqEhuc" jscontroller="pk1i4d"></li>--%>
+                                                        <s:url action="borrar" var="urlBru" includeParams="get" escapeAmp="false"/>
+                                                        <s:set var="url"><s:property value="urlBru"/>&<s:property/></s:set>
+                                                        <li class="bqX" data-tooltip="Eliminar">
+                                                            <s:a  href="%{url}" class="acciones bru">&nbsp;&nbsp;</s:a>
+                                                        </li>
+                                                        <s:url action="editar" var="urlEdt" includeParams="get" escapeAmp="false"/>
+                                                        <s:set var="urle"><s:property value="urlEdt"/>&<s:property/></s:set>
+                                                        <li class="bqX" data-tooltip="Editar">
+                                                            <s:a  href="%{urle}" class="acciones edt">&nbsp;&nbsp;</s:a>
+                                                        </li>
+                                                        <s:url action="insertar" var="urlIns" includeParams="get" escapeAmp="false"/>
+                                                        <li class="bqX" data-tooltip="Insertar">
+                                                            <s:a  href="%{urlIns}" class="acciones ins">&nbsp;&nbsp;</s:a>
+                                                        </li>
+                                                        <%--<li class="bqX brs" data-tooltip="Marcar como no leído" jsaction="XdlY1e" jscontroller="VtSflc"></li>
+                                                        <li class="bqX brv" data-tooltip="Posponer" jsaction="u4Fnue" jscontroller="PKSrle"></li>--%>
+                                                    </ul>
+                                                </td>
+                                            </s:else>
                                         </s:if>
+                                        <!-- resto de columnas-->
                                         <s:else>
-                                                <td><s:property/></td>
+                                            <!-- primera fila -->
+                                            <s:if test="#status.first == true">
+                                                <th><s:property /></th>
+                                            </s:if>
+                                            <!-- resto de filas -->
+                                            <s:else>
+                                                <td>
+                                                    <s:property/>
+                                                </td>
+                                            </s:else>
                                         </s:else>
                                     </s:iterator>
                                 </tr>
@@ -47,6 +89,7 @@
                             </s:iterator>
                     </table>
                 </div>
+                <!--div id="derecha">derecha</div>-->
             </div>
         </div>
         <script src="${pageContext.request.contextPath}/resources/ordenacion.js"></script>

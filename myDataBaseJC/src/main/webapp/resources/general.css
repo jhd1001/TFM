@@ -41,7 +41,6 @@ form {
 
 /* formato para el contenedor único, zona central */
 #contenido-unico {
-    margin: 20px;
     float: initial;
 }
 
@@ -98,6 +97,15 @@ form {
   color: #e94f31;
 }
 
+/* formato previo de links en tablas de zona central */
+#contenido-unico table tr td .acciones:before {
+    content: "";
+}
+
+#contenido-unico table tr td .acciones {
+    padding-left: 0px;
+}
+
 /* formato de resalte de links en tablas de zona central */
 #contenido-unico table tr td a:hover {
   color: #e94f31;
@@ -125,6 +133,18 @@ div.bordeado {
     border-radius: 3px;
 }
 
+/* formato de divs de clase bordeado */
+div.bordeado50 {
+    border-color: black;
+    border-width: thin;
+    border-style: solid;
+    padding: 15px;
+    width: 50%;
+    margin: auto;
+    border-bottom: 4px solid #656659;
+    border-radius: 3px;
+}
+
 /* formato de divs de clase descripcion */
 div.descripcion {
     text-align: justify;
@@ -144,6 +164,10 @@ table.tabla {
     margin: 0 auto;
     border-bottom: 4px solid #656659;
     border-radius: 3px;
+}
+
+.tabla tr {
+    position: sticky;
 }
 
 /* formato de id filtro-div */
@@ -220,4 +244,62 @@ table.wwFormTable {
 .titulo {
     font-size: 16px;
     font-weight: bold;
+}
+
+.ocultar {
+    display: none !important;
+}
+
+/* Formato toolbar de registros de resultset de tabla */
+.bru {
+    background-image: url(images/delete_black_20dp.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 20px;
+}
+.edt {
+    background-image: url(images/edit_black_20dp.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 20px;
+}
+.ins {
+    background-image: url(images/insert_black_20.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 20px;
+}
+.bqX {
+    height: 20px;
+    opacity: .54;
+    width: 20px;
+    opacity: .54;
+    align-items: center;
+    border: none;
+    display: inline-flex;
+    justify-content: center;
+    outline: none;
+    position: relative;
+    z-index: 0;
+    cursor: pointer;
+    list-style: none;
+    margin: 0 10px;
+    margin-right: 0px;
+    margin-left: 0px; 
+}
+.bqY {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-right: 6px;
+    padding: 0;
+    position: absolute; 
+    left: 0; 
+    top: 0; 
+    background: linear-gradient(#f7f7f7 0%, #ececec 100%); 
+    height: 100%;
 }

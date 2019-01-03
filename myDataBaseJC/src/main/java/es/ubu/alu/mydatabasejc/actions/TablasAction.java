@@ -7,8 +7,10 @@ package es.ubu.alu.mydatabasejc.actions;
 
 import com.opensymphony.xwork2.Preparable;
 import es.ubu.alu.mydatabasejc.exceptions.ResultSetException;
+import es.ubu.alu.mydatabasejc.exceptions.SQLCommandException;
 import es.ubu.alu.mydatabasejc.exceptions.TablasActionException;
 import es.ubu.alu.mydatabasejc.jdbc.ConnectionImpl;
+import es.ubu.alu.mydatabasejc.jdbc.SQLCommand;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,6 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.struts2.interceptor.ParameterAware;
+import org.apache.struts2.interceptor.RequestAware;
 import org.apache.struts2.interceptor.SessionAware;
 
 /**
@@ -33,7 +39,145 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
     private String TABLE_TYPE;
     private List<List> listInfo;
     private Set<String> arrayParametros;
+    private String[] pkArgumentos;
+    private String[] pkValores;
+    private boolean metodoLink;
+    private String[] formCampos;
+    private String[] formValores;
+    private Map<String, Integer> mapaEditables;
+    private Map<String, Integer[]> mapaCompleto;
 
+    public boolean isEditDisabled(String campo) {
+        for (String campoWritable : mapaEditables.keySet()) {
+            if (campoWritable.equalsIgnoreCase(campo))
+                return false;
+        }
+        return true;
+    }
+    
+    public String insertarGuardar() {
+        if (TABLE_NAME == null || "".equals(TABLE_NAME)) {
+            sesion.put(ACTION_ERROR, "Faltan.esquema.o.nombre.de.tabla");
+            return "tablas";
+        }
+        if (formCampos == null || formCampos.length == 0 || formValores == null || formValores.length == 0) {
+            sesion.put(ACTION_ERROR, "Faltan.datos.para.hacer.la.operacion");
+            return "consulta";
+        }
+
+        try {
+            SQLCommand sqlComand = new SQLCommand(connectionImpl);
+            if (sqlComand.executeUpdate(TABLE_SCHEM, TABLE_NAME, mapaCompleto, formCampos, formValores)==0)  {
+                sesion.put(ACTION_MESSAGE, "No.se.ha.insertado.ningún.registro");
+            } else {
+                sesion.put(ACTION_MESSAGE, "El.registro.ha.sido.insertado");
+            }
+        } catch (SQLCommandException ex) {
+            sesion.put("ACTION_ERROR", ex.getLocalizedMessage());
+        } finally {
+            return "consulta";
+        }
+    }
+    
+    public String insertar() {
+        if (TABLE_NAME == null || "".equals(TABLE_NAME)) {
+            sesion.put(ACTION_ERROR, "Faltan.esquema.o.nombre.de.tabla");
+            return "tablas";
+        }
+        
+        SQLCommand sqlCommand = new SQLCommand(connectionImpl);
+        // define el array de los campos para presentarlos en la jsp
+        arrayParametros = sqlCommand.getMap(mapaCompleto, SQLCommand.ISAUTOINCREMENT + SQLCommand.ISDEFINITELYWRITABLE + SQLCommand.ISWRITABLE).keySet();
+
+        return SUCCESS;
+    }
+    
+    public Object getPkValores(int i) {
+        return pkValores == null ? null : (i>=pkValores.length ? null : pkValores[i]);
+    }
+
+    public String editarGuardar() {
+        if (TABLE_NAME == null || "".equals(TABLE_NAME)) {
+            sesion.put(ACTION_ERROR, "Faltan.esquema.o.nombre.de.tabla");
+            return "tablas";
+        }
+        if (pkArgumentos == null || pkArgumentos.length == 0) {
+            sesion.put(ACTION_ERROR, "Falta.primary.key");
+            return "consulta";
+        }
+        if (formCampos == null || formCampos.length == 0 || formValores == null || formValores.length == 0) {
+            sesion.put(ACTION_ERROR, "Faltan.datos.para.hacer.la.operacion");
+            return "consulta";
+        }
+
+        try {
+            SQLCommand sqlComand = new SQLCommand(connectionImpl);
+            if (sqlComand.executeUpdate(TABLE_SCHEM, TABLE_NAME, mapaCompleto, SQLCommand.OPERACION_UPDATE, pkArgumentos, pkValores, formCampos, formValores)==0)  {
+                sesion.put(ACTION_MESSAGE, "No.se.ha.actualizado.ningún.registro");
+            } else {
+                sesion.put(ACTION_MESSAGE, "El.registro.ha.sido.actualizado");
+            }
+        } catch (SQLCommandException ex) {
+            sesion.put("ACTION_ERROR", ex.getLocalizedMessage());
+        } finally {
+            return "consulta";
+        }
+    }
+    
+    public String editar(){
+        if (TABLE_NAME == null || "".equals(TABLE_NAME)) {
+            sesion.put(ACTION_ERROR, "Faltan.esquema.o.nombre.de.tabla");
+            return "tablas";
+        }
+        if (pkArgumentos == null || pkArgumentos.length == 0) {
+            sesion.put(ACTION_ERROR, "Falta.primary.key");
+            return "consulta";
+        }
+
+        // obtiene el resultset del registro a editar
+        ResultSet rs = null;
+        try {
+            SQLCommand sqlComand = new SQLCommand(connectionImpl);
+            // y se resuelve el resultset
+            rs = sqlComand.executeQuery(TABLE_SCHEM, TABLE_NAME, mapaCompleto, pkArgumentos, pkValores, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            // se transforma el resultset en una lista para su visualización
+            listInfo = getListInfoReverse(rs);
+            // se consigue el mapa de campos editables.
+            mapaEditables = sqlComand.getMap(mapaCompleto, SQLCommand.ISDEFINITELYWRITABLE + SQLCommand.ISWRITABLE);
+
+        } catch (SQLCommandException ex) {
+            addActionError(ex.getMessage());
+            return ERROR;
+        } finally {
+            cierraRS(rs,null);
+        }
+        return SUCCESS;
+    }
+    
+    public String borrar(){
+        if (TABLE_NAME == null || "".equals(TABLE_NAME)) {
+            sesion.put(ACTION_ERROR, "Faltan.esquema.o.nombre.de.tabla");
+            return "tablas";
+        }
+        if (pkArgumentos == null || pkArgumentos.length == 0) {
+            sesion.put(ACTION_ERROR, "Falta.primary.key");
+            return "consulta";
+        }
+
+        try {
+            SQLCommand sqlComand = new SQLCommand(connectionImpl);
+            if (sqlComand.executeUpdate(TABLE_SCHEM, TABLE_NAME, mapaCompleto, SQLCommand.OPERACION_DELETE, pkArgumentos, pkValores, null, null)==0)  {
+                sesion.put(ACTION_ERROR, "No.se.ha.eliminado.ningún.registro");
+            } else {
+                sesion.put(ACTION_MESSAGE, "El.registro.ha.sido.eliminado");
+            }
+        } catch (SQLCommandException ex) {
+            sesion.put(ACTION_ERROR, ex.getLocalizedMessage());
+        } finally {
+            return "consulta";
+        }
+    }
+    
     public Object getParameter(int i) {
         String[] a = {};
         return sesion.get(TABLE_SCHEM + "." + TABLE_NAME + "." + arrayParametros.toArray(a)[i]);
@@ -53,31 +197,9 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
      * @throws SQLException 
      */
     private Map<String, Integer> setParametrosSesion(String tabla) {
-        // busca el mapa del resultset en la sesión del usuario
-        Map<String, Integer> mapa = (Map<String, Integer>)sesion.get(tabla);
-        // si el mapa aún no se ha creado
-        if (mapa == null) {
-            // se crea un mapa vacío
-            mapa = new HashMap<String, Integer>();
-            // y completa el hashmap a partir de un resultset vacío de la tabla
-            // obtiene el resultset vacío para llegar al metadata
-            ResultSet rs = null;
-            try {
-                rs = connectionImpl.getConnection().createStatement().executeQuery("SELECT * FROM " + tabla + " WHERE 1=2");
-                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                    if (!rs.getMetaData().isSearchable(i)) continue;
-                    // cada elemento del mapa tendrá el nombre y el tipo de las columnas buscables
-                    mapa.put(rs.getMetaData().getColumnName(i), rs.getMetaData().getColumnType(i));
-                }
-                // finalmente se añade el mapa a la sesión para no tener que repetir esta
-                // consulta vacía en la base de datos.
-                sesion.put(tabla, mapa);
-            } catch (SQLException ex) {
-                new TablasActionException(ex);
-            } finally {
-                if (rs!=null) try {rs.close();} catch (SQLException e) {;}
-            }
-        }
+        // obtiene el mapa de campos de búsqueda
+        SQLCommand sqlCommand = new SQLCommand(connectionImpl);
+        Map<String, Integer> mapa = sqlCommand.getMap(mapaCompleto, SQLCommand.ISSEARCHABLE);
         
         // En la segunda fase de la función, se analizan los parámetros de la request
         // para añadir a la sesión los datos de filtrado enviados por el usuario
@@ -94,47 +216,7 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
                 // si el valor recibido no está en blanco
                 if (!"".equals(filtroValores[i])) 
                     // se asigna a la variable valor
-                    switch (mapa.get(columna)) {
-                    //switch (rs.getMetaData().getColumnType(i)) {
-                        case Types.ARRAY: 
-                            String[] valores = filtroValores[i].split(",",0); 
-                            List<String> lvalores = new ArrayList();
-                            for (int k = 0; k< valores.length; k++)
-                                if (!"".equals(valores[k])) lvalores.add(valores[k].trim());
-                            valor = lvalores.toArray(valores);
-                            break;
-                        // para tipos Integer
-                        case Types.BIGINT: 
-                        case Types.INTEGER: 
-                        case Types.ROWID: valor = Integer.valueOf(filtroValores[i]); break;
-                        // para tipos Short
-                        case Types.SMALLINT: valor = Short.valueOf(filtroValores[i]); break;
-                        // para tipos boolean
-                        case Types.BIT: 
-                        case Types.BOOLEAN: valor = Boolean.valueOf(filtroValores[i]); break;
-                        // para tipos fecha
-                        case Types.DATE:
-                        case Types.TIME:
-                        case Types.TIMESTAMP:
-                        case Types.TIME_WITH_TIMEZONE: valor = Date.valueOf(filtroValores[i]); break;
-                        // para tipos float
-                        case Types.DECIMAL:
-                        case Types.DOUBLE:
-                        case Types.FLOAT:
-                        case Types.NUMERIC:
-                        case Types.REAL: valor = Float.valueOf(filtroValores[i]); break;
-                        // para tipos string
-                        case Types.CHAR:
-                        case Types.DATALINK:
-                        case Types.LONGNVARCHAR:
-                        case Types.LONGVARCHAR:
-                        case Types.NCHAR:
-                        case Types.NVARCHAR:
-                        case Types.SQLXML:
-                        case Types.VARCHAR: valor = filtroValores[i]; break;
-                        // en otro caso, valor por defecto
-                        default: valor = filtroValores[i];
-                    }
+                    valor = SQLCommand.getValor(mapa.get(columna), filtroValores[i]);
                 // y se añade a la sesión del usuario con el nombre de esquema,
                 // tabla y columna
                 sesion.put(atributo, valor);
@@ -154,60 +236,55 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
      * @return 
      */
     public String consulta() {
-        if (TABLE_SCHEM == null || "".equals(TABLE_SCHEM) || TABLE_NAME == null || "".equals(TABLE_NAME)) {
-            addActionError("Faltan.esquema.o.nombre.de.tabla");
+        // Recoge los mensajes de error previos y los establece en esta acción
+        if (sesion.get(ACTION_ERROR)!=null) {
+            addActionError(getText((String)sesion.get(ACTION_ERROR)));
+            sesion.remove(ACTION_ERROR);
+        }
+        
+        // Recoge los mensajes informativos previos y los establece en esta acción
+        if (sesion.get(ACTION_MESSAGE)!=null) {
+            addActionMessage(getText((String)sesion.get(ACTION_MESSAGE)));
+            sesion.remove(ACTION_MESSAGE);
+        }
+        
+        // comprueba que los parámetros se reciban correctamente
+        if (TABLE_NAME == null || "".equals(TABLE_NAME)) {
+            sesion.put(ACTION_ERROR, "Faltan.esquema.o.nombre.de.tabla");
             return "back";
         }
-        List<Object> listaParametros = new ArrayList<>();
+        metodoLink = false; // Será true cuando exista una primary key en la tabla consultada
         
         // establece y recoge los parámetros de búsqueda en sesión del usuario
-        Map<String, Integer> mapa = setParametrosSesion(TABLE_SCHEM + "." + TABLE_NAME);
+        Map<String, Integer> mapa = setParametrosSesion(
+                TABLE_SCHEM==null ? TABLE_NAME :
+                        (TABLE_SCHEM.equals("") ? TABLE_NAME : 
+                                TABLE_SCHEM + "." + TABLE_NAME));
 
         // define el array de posibles parámetros para presentarlos en la jsp
         arrayParametros = mapa.keySet();
-        // y la lista de parámetros que hay que añadir a la consulta sql
-        String where = "";
-        // para cada columna del resultset
-        for (String columna : arrayParametros) {
-            // se busca en la sesión del usuario
-            Object o = sesion.get(TABLE_SCHEM + "." + TABLE_NAME + "." + columna);
-            // si el parámetro existe y no es "", se añade la condición a la cadena where
-            // y el valor a la lista de parametros
-            if (o!=null && !"".equals(o.toString())) {
-                // si no es el primer elemento se antepone AND
-                if (listaParametros.size()!=0) where = where + "AND ";
-                // si es el primer filtro, se antepone where
-                else where = "where ";
-                // y a continuación se añade el nombre del campo y la posición del parámetro.
-                // esto evitará ataques por SQL inyection
-                where = where + columna + " = ? ";
-                listaParametros.add(o);
-            }
-        }
-            
 
-        PreparedStatement ps = null;
+        //PreparedStatement ps = null;
         ResultSet rs = null;
-        // Se obtiene la cadena de consulta definitiva
-        String sql = String.format("SELECT * FROM %s.%s %s", TABLE_SCHEM, TABLE_NAME, where);            
+        ResultSet rs2 = null;
         try {
-            // se obtiene el PreparedStatemtne
-            ps = connectionImpl.getConnection().prepareStatement(sql);
-            // se asignan los parámetros
-            int parameterIndex = 1;
-            for (Object o : listaParametros)
-                ps.setObject(parameterIndex++, o);
-            // y se resuelve el resultset
-            rs = ps.executeQuery();
-
-            // se transforma el resultset en una lista para su visualización
+            SQLCommand sqlCommand = new SQLCommand(connectionImpl);
+            rs = sqlCommand.executeQuery(TABLE_SCHEM, TABLE_NAME, arrayParametros, sesion);
+            // se obtiene una lista con los campos primary key
+            List<String> pkList = new ArrayList<>();
             String[] linkParametros = {};
-            listInfo = getListInfo(rs, false, linkParametros);
-        } catch (ResultSetException | Exception ex) {
+            rs2 = connectionImpl.getConnection().getMetaData().getPrimaryKeys("", TABLE_SCHEM, TABLE_NAME);
+            while (rs2.next()) 
+                pkList.add(rs2.getString("COLUMN_NAME"));
+            if (pkList.size()!=0) metodoLink = true;
+            // se transforma el resultset en una lista para su visualización
+            listInfo = getListInfo(rs, metodoLink, pkList.toArray(linkParametros), "pkArgumentos", "pkValores");
+        } catch (ResultSetException | SQLException | SQLCommandException ex) {
             addActionError(ex.getMessage());
             return ERROR;
         } finally {
-            cierraRS(rs, ps);
+            cierraRS(rs, null);
+            cierraRS(rs2, null);
         }
         return SUCCESS;
     }
@@ -218,6 +295,26 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
     @Override
     public void validate() {
         super.validarLogin(connectionImpl);
+        // si no hay errores, se carga el mapa de la tabla consultada
+        if (!hasActionErrors()) {
+            // busca el mapa del resultset en la sesión del usuario
+            mapaCompleto = (Map<String, Integer[]>)sesion.get(
+                    TABLE_SCHEM==null ? TABLE_NAME :
+                        (TABLE_SCHEM.equals("") ? TABLE_NAME : 
+                                TABLE_SCHEM + "." + TABLE_NAME));
+            // si el mapa aún no se ha creado
+            if (mapaCompleto == null) {
+                // se calcula y se guarda en la sesión
+                SQLCommand sqlCommand = new SQLCommand(connectionImpl);
+                mapaCompleto = sqlCommand.getMap(TABLE_SCHEM, TABLE_NAME);
+                sesion.put(
+                    TABLE_SCHEM==null ? TABLE_NAME :
+                        (TABLE_SCHEM.equals("") ? TABLE_NAME : 
+                                TABLE_SCHEM + "." + TABLE_NAME), 
+                    mapaCompleto);
+            }
+        }
+            
     }
 
     @Override
@@ -232,7 +329,7 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
      */
     @Override
     public void prepare() throws Exception {
-        connectionImpl = (ConnectionImpl) sesion.get("conexion");
+        connectionImpl = (ConnectionImpl) sesion.get(CONEXION);
     }
 
     public String getTABLE_SCHEM() {return TABLE_SCHEM;}
@@ -258,5 +355,25 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
     public ConnectionImpl getConnectionImpl() {return connectionImpl;}
 
     public void setConnectionImpl(ConnectionImpl connectionImpl) {this.connectionImpl = connectionImpl;}
+
+    public String[] getPkArgumentos() {return pkArgumentos;}
+
+    public void setPkArgumentos(String[] pkArgumentos) {this.pkArgumentos = pkArgumentos;}
+
+    public String[] getPkValores() {return pkValores;}
+
+    public void setPkValores(String[] pkValores) {this.pkValores = pkValores;}
+
+    public boolean isMetodoLink() {return metodoLink;}
+
+    public void setMetodoLink(boolean metodoLink) {this.metodoLink = metodoLink;}
+
+    public String[] getFormCampos() {return formCampos;}
+
+    public void setFormCampos(String[] formCampos) {this.formCampos = formCampos;}
+
+    public String[] getFormValores() {return formValores;}
+
+    public void setFormValores(String[] formValores) {this.formValores = formValores;}
 
 }

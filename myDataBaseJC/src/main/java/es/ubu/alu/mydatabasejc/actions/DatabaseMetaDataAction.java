@@ -6,9 +6,7 @@
 package es.ubu.alu.mydatabasejc.actions;
 
 import com.opensymphony.xwork2.Preparable;
-import es.ubu.alu.mydatabasejc.Menu;
 import es.ubu.alu.mydatabasejc.PropiedadValor;
-import es.ubu.alu.mydatabasejc.ValoresPorDefecto;
 import es.ubu.alu.mydatabasejc.annotations.MetaDataLink;
 import es.ubu.alu.mydatabasejc.exceptions.DatabaseMetaDataException;
 import es.ubu.alu.mydatabasejc.exceptions.ResultSetException;
@@ -23,13 +21,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.struts2.components.URL;
 import org.apache.struts2.interceptor.SessionAware;
 
 /**
@@ -70,7 +65,7 @@ public class DatabaseMetaDataAction extends MenuAction implements Preparable, Se
     public String info() {
         // Si metodo no contiene ningún valor, error
         if (metodo==null || metodo.length()==0) {
-            addActionError("Llamada.a.la.accion.resultset.incorrecta");
+            addActionError(getText("Llamada.a.la.accion.resultset.incorrecta"));
             return ERROR;
         }
         try {
@@ -90,9 +85,15 @@ public class DatabaseMetaDataAction extends MenuAction implements Preparable, Se
      * @return "success" si no se produce error, "error" en caso contrario
      */
     public String resultset() {
+        // Recoge los mensajes de error previos y los establece en esta acción
+        if (sesion.get(ACTION_ERROR)!=null) {
+            addActionError(getText((String)sesion.get(ACTION_ERROR)));
+            sesion.remove(ACTION_ERROR);
+        }
+
         // Si metodo no contiene ningún valor, error
         if (metodo==null || metodo.length()==0) {
-            addActionError("Llamada.a.la.accion.resultset.incorrecta");
+            addActionError(getText("Llamada.a.la.accion.resultset.incorrecta"));
             return ERROR;
         }
         ResultSet rs = null;
@@ -249,7 +250,7 @@ public class DatabaseMetaDataAction extends MenuAction implements Preparable, Se
      */
     @Override
     public void prepare() throws Exception {
-        connectionImpl = (ConnectionImpl) sesion.get("conexion");
+        connectionImpl = (ConnectionImpl) sesion.get(CONEXION);
     }
 
     public ConnectionImpl getConnectionImpl() {return connectionImpl;}
