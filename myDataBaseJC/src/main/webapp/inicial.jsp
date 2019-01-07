@@ -13,6 +13,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/general.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/ayuda.css">
         <title>My DataBase JC</title>
     </head>
     <body>
@@ -26,15 +27,13 @@
                 <div class="centrado">
                     <table class="tabla">
                         <tr>
-                            <th>Propiedad</th>
+                            <th title="<s:property value='%{ayuda("Los.elementos.siguientes.pueden.disponer.de.ayuda.adicional")}'/>" class="ayuda">Propiedad</th>
                             <th>Valor</th>
                         </tr>
                         <s:iterator value="listInicial">
                             <tr>
-                                <td>
-                                    <%--<s:i18n name="es.ubu.alu.mydatabasejc.connectionInfo">--%>
+                                <td title='<s:property value="%{ayuda(propiedad)}"/>'>
                                     <s:property value="%{getText(propiedad)}"/>
-                                    <%--</s:i18n>--%>
                                 </td>
                                 <td><s:property value="valor"/></td>
                             </tr>

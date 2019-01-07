@@ -5,7 +5,6 @@
  */
 package es.ubu.alu.mydatabasejc.annotations;
 
-import alu.ubu.es.mydatabasejc.actions.*;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -10,6 +10,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/ayuda.css">
         <title>JSP Page</title>
     </head>
     <body>
@@ -39,11 +40,11 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><s:property value="connectionImpl.url"/></td>
+                    <td title="<s:property value='%{ayuda("URL")}'/>" class="ayuda"><s:property value="connectionImpl.url"/></td>
                     <td class="right"><s:property value="@es.ubu.alu.mydatabasejc.ValoresPorDefecto@autor"/></td>
                 </tr>
                 <tr>
-                    <td><s:property value="connectionImpl.driver"/></td>
+                    <td title="<s:property value='%{ayuda("getDriverName")}'/>" class="ayuda"><s:property value="connectionImpl.driver"/></td>
                     <td class="right"><s:property value="@es.ubu.alu.mydatabasejc.ValoresPorDefecto@email"/></td>
                 </tr>
             </table>

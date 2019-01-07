@@ -8,6 +8,8 @@ package es.ubu.alu.mydatabasejc.actions;
 import com.opensymphony.xwork2.ActionSupport;
 import es.ubu.alu.mydatabasejc.exceptions.ConnectionException;
 import es.ubu.alu.mydatabasejc.jdbc.ConnectionImpl;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.struts2.ServletActionContext;
 
@@ -21,6 +23,16 @@ public class LoginAction extends ActionSupport {
     private String usuario;
     private String password;
 
+    public String ayuda(String propiedad) {
+        ResourceBundle myResources = null;
+        try {
+            myResources = ResourceBundle.getBundle("es/ubu/alu/mydatabasejc/help", this.getLocale());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return myResources!=null ? myResources.getString(propiedad) : propiedad;
+    }
+    
     /**
      * Realiza la validación de los campos de formulario
      */

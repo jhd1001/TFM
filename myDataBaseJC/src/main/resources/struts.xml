@@ -12,7 +12,11 @@
         </global-results>
         <action name="validarLogin" class="es.ubu.alu.mydatabasejc.actions.LoginAction" method="validarLogin">
             <result name="error">/login.jsp</result>
-            <result>/inicial.jsp</result>
+            <result type="redirectAction">
+                <param name="actionName">inicial</param>
+                <param name="namespace">/DatabaseMetaData</param>
+                <param name="parse">false</param>
+            </result>
         </action>
         <action name="login" class="es.ubu.alu.mydatabasejc.actions.LoginAction" method="login">
             <result name="error">/login.jsp</result>

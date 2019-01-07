@@ -5,8 +5,7 @@
  */
 package es.ubu.alu.mydatabasejc.jdbc;
 
-import alu.ubu.es.mydatabasejc.actions.MetaDataInfoCategorias;
-import es.ubu.alu.mydatabasejc.PropiedadValor;
+import es.ubu.alu.mydatabasejc.annotations.MetaDataInfoCategorias;
 import es.ubu.alu.mydatabasejc.annotations.MetaDataLink;
 import java.lang.reflect.Method;
 import java.sql.Connection;

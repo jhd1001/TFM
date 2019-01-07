@@ -1,0 +1,22 @@
+.ayuda {
+    background-image: url(images/help_black_20dp.png) !important;
+    background-repeat: no-repeat !important;
+    background-attachment: scroll !important;
+    background-size: 20px 20px !important;
+    background-position: 98% 50% !important;
+    cursor: auto !important;
+    background-blend-mode: hard-light !important;
+}
+input.ayuda {
+}
+th.ayuda {
+    color: black !important;
+}
+li.ayuda {
+    color: black !important;
+}
+td.ayuda {
+    background-position: 0% 50% !important;
+    color: black !important;
+    padding-left: 25px;
+}

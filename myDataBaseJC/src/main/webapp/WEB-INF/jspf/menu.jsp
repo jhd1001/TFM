@@ -13,7 +13,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/menu.css">
-        <!--script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script-->
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/ayuda.css">
         <script src="${pageContext.request.contextPath}/resources/jquery-3.3.1.min.js"></script>
         <script src="${pageContext.request.contextPath}/resources/menu.js"></script>
         <title>menu</title>
@@ -24,7 +24,7 @@
                 <li><a href="#"><span>Conexión<br><s:property value="connectionImpl.usuario"/></span></a></li>
                 <li class="has-sub"><a href="#"><span>Acerca de</span></a>
                     <ul>
-                        <li><a href="#"><span>Empresa</span></a></li>
+                        <li><a href="#"><span>Configuración</span></a></li>
                         <li class="last"><a href="#"><span>Contacto</span></a></li>
                     </ul>
                 </li>
@@ -32,12 +32,12 @@
                 <li class="has-sub active"><a href="#"><span>Métodos DatabaseMetaData</span></a>
                     <ul style="display: block;">
                         <s:iterator value="menus">
-                            <li>
+                            <li class="ayuda">
                                 <s:url action="%{action}" var="urlTag" namespace="/DatabaseMetaData">
                                     <s:param name="metodo"><s:property value="metodo"/></s:param>
                                     <s:param name="parametros"><s:property value="parametros"/></s:param>
                                 </s:url>
-                                <s:a href="%{urlTag}"><s:property value="%{getText(metodo)}"/></s:a>
+                                <s:a href="%{urlTag}" title='%{ayuda(metodo)}'><s:property value="%{getText(metodo)}"/></s:a>
                             </li>
                         </s:iterator>
                     </ul>

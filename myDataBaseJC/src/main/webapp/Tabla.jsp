@@ -16,6 +16,7 @@
         <script src="${pageContext.request.contextPath}/resources/jquery-3.3.1.min.js"></script>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/general.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/ordenacion.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/ayuda.css">
     </head>
     <body>
         <div id="page">
@@ -49,23 +50,20 @@
                                             <s:else>
                                                 <td>
                                                     <ul class="bqY ocultar">
-                                                        <%--<li class="bqX brq" data-tooltip="Archivar" jsaction="JqEhuc" jscontroller="pk1i4d"></li>--%>
                                                         <s:url action="borrar" var="urlBru" includeParams="get" escapeAmp="false"/>
                                                         <s:set var="url"><s:property value="urlBru"/>&<s:property/></s:set>
-                                                        <li class="bqX" data-tooltip="Eliminar">
+                                                        <li class="bqX" title="<s:property value='%{ayuda("borrar.registro")}'/>">
                                                             <s:a  href="%{url}" class="acciones bru">&nbsp;&nbsp;</s:a>
                                                         </li>
                                                         <s:url action="editar" var="urlEdt" includeParams="get" escapeAmp="false"/>
                                                         <s:set var="urle"><s:property value="urlEdt"/>&<s:property/></s:set>
-                                                        <li class="bqX" data-tooltip="Editar">
+                                                        <li class="bqX" title="<s:property value='%{ayuda("update.registro")}'/>">
                                                             <s:a  href="%{urle}" class="acciones edt">&nbsp;&nbsp;</s:a>
                                                         </li>
                                                         <s:url action="insertar" var="urlIns" includeParams="get" escapeAmp="false"/>
-                                                        <li class="bqX" data-tooltip="Insertar">
+                                                        <li class="bqX" title="<s:property value='%{ayuda("insert.registro")}'/>">
                                                             <s:a  href="%{urlIns}" class="acciones ins">&nbsp;&nbsp;</s:a>
                                                         </li>
-                                                        <%--<li class="bqX brs" data-tooltip="Marcar como no leído" jsaction="XdlY1e" jscontroller="VtSflc"></li>
-                                                        <li class="bqX brv" data-tooltip="Posponer" jsaction="u4Fnue" jscontroller="PKSrle"></li>--%>
                                                     </ul>
                                                 </td>
                                             </s:else>
