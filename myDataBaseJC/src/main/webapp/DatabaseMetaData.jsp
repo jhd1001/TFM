@@ -44,9 +44,9 @@
                                         <s:elseif test="#stat.count != 1">
                                             <th><s:property /></th>
                                         </s:elseif>
-                                        <s:else>
+                                        <s:elseif test='#propiedad != null'>
                                             <th class="ayuda"><s:property/></th>
-                                        </s:else>
+                                        </s:elseif>
                                     </s:if>
                                     <s:else>
                                         <s:if test="metodoLink">

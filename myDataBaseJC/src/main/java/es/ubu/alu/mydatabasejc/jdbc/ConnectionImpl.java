@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package es.ubu.alu.mydatabasejc.jdbc;
 
 import es.ubu.alu.mydatabasejc.exceptions.ConnectionException;
@@ -14,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Establece y manteniene la información de una conexión con la base de datos
  * @author jhuidobro
  */
 public class ConnectionImpl {
@@ -53,6 +48,10 @@ public class ConnectionImpl {
             driver = "url.no.indicada";
         else if (url.toLowerCase().contains("oracle"))
             driver = "oracle.jdbc.driver.OracleDriver";
+        else if (url.toLowerCase().contains("mysql"))
+            driver = "com.mysql.jdbc.Driver";
+        else if (url.toLowerCase().contains("sqlserver"))
+            driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
         else
             driver = "url.no.valida.Sin.driver";
         

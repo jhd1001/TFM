@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package es.ubu.alu.mydatabasejc.jdbc;
 
 import es.ubu.alu.mydatabasejc.exceptions.SQLCommandException;
@@ -18,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * Clase que permite al usuario ejecutar comandos sql contra la base de datos
  * @author jhuidobro
  */
 public class SQLCommand {
@@ -48,6 +43,7 @@ public class SQLCommand {
     public List<Object> listaParametrosInsert;
 
     public static Object getValor(int tipo, String valor) {
+        valor = valor==null ? null : ("".equals(valor) ? null : valor);
         switch (tipo) {
             case Types.ARRAY:
                 String[] valores = valor.split(",", 0);
@@ -62,27 +58,27 @@ public class SQLCommand {
             case Types.BIGINT:
             case Types.INTEGER:
             case Types.ROWID:
-                return Integer.valueOf(valor);
+                return valor==null ? (Integer)null : Integer.valueOf(valor);
             // para tipos Short
             case Types.SMALLINT:
-                return Short.valueOf(valor);
+                return valor==null ? (Short)null : Short.valueOf(valor);
             // para tipos boolean
             case Types.BIT:
             case Types.BOOLEAN:
-                return Boolean.valueOf(valor);
+                return valor==null ? (Boolean)null : Boolean.valueOf(valor);
             // para tipos fecha
             case Types.DATE:
             case Types.TIME:
             case Types.TIMESTAMP:
             case Types.TIME_WITH_TIMEZONE:
-                return Date.valueOf(valor);
+                return valor==null ? (Date)null : Date.valueOf(valor);
             // para tipos float
             case Types.DECIMAL:
             case Types.DOUBLE:
             case Types.FLOAT:
             case Types.NUMERIC:
             case Types.REAL:
-                return Float.valueOf(valor);
+                return valor==null ? (Float)null : Float.valueOf(valor);
             // para tipos string
             case Types.CHAR:
             case Types.DATALINK:
@@ -92,7 +88,7 @@ public class SQLCommand {
             case Types.NVARCHAR:
             case Types.SQLXML:
             case Types.VARCHAR:
-                return valor;
+                return valor==null ? (String)null : valor;
             // en otro caso, valor por defecto
             default:
                 return valor;
@@ -174,35 +170,7 @@ public class SQLCommand {
             }
         }
     }
-/*
-    private boolean tipoSeleccionable(ResultSet rs, int columna, int tipoCampo) throws SQLException {
-        if (rs.getMetaData().isAutoIncrement(columna) && ((tipoCampo & ISAUTOINCREMENT) != 0)) {
-            return true;
-        }
-        if (rs.getMetaData().isCaseSensitive(columna) && ((tipoCampo & ISCASESENSITIVE) != 0)) {
-            return true;
-        }
-        if (rs.getMetaData().isCurrency(columna) && ((tipoCampo & ISCURRENCY) != 0)) {
-            return true;
-        }
-        if (rs.getMetaData().isDefinitelyWritable(columna) && ((tipoCampo & ISDEFINITELYWRITABLE) != 0)) {
-            return true;
-        }
-        if (rs.getMetaData().isReadOnly(columna) && ((tipoCampo & ISREADONLY) != 0)) {
-            return true;
-        }
-        if (rs.getMetaData().isSearchable(columna) && ((tipoCampo & ISSEARCHABLE) != 0)) {
-            return true;
-        }
-        if (rs.getMetaData().isSigned(columna) && ((tipoCampo & ISSIGNED) != 0)) {
-            return true;
-        }
-        if (rs.getMetaData().isWritable(columna) && ((tipoCampo & ISWRITABLE) != 0)) {
-            return true;
-        }
-        return false;
-    }
-*/
+
     public Map<String, Integer> getMap(Map<String, Integer[]> mapa, int tipo) {
         Map<String, Integer> retorno = new HashMap<String, Integer>();
         for (String columna : mapa.keySet()) {
@@ -342,7 +310,7 @@ public class SQLCommand {
         }
         n = 0;
         for (String columna : pkArgumentos) {
-            Object o = getValor(mapa.get(columna)[0], valores[n++]); //pkValores[n++];
+            Object o = getValor(mapa.get(columna)[0], pkValores[n++]); //pkValores[n++];
             if (listaParametrosWhere.size() != 0) {
                 cadenaWhere = cadenaWhere + "AND  ";
             } else {
@@ -377,7 +345,7 @@ public class SQLCommand {
                     cadenaWhere);
         } else if (operacion == OPERACION_DELETE) {
             setSQLPartList(mapa, pkArgumentos, pkValores, OPERACION_WHERE);
-            sql = String.format("DELETE %s%s %s",
+            sql = String.format("DELETE FROM %s%s %s",
                     getEsquema(esquema),
                     tabla,
                     cadenaWhere);

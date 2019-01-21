@@ -17,7 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Implementa los métodos de DatabaseMetaData y se añaden
+ * los métodos necesraios para agrupar los que devuelven
+ * información en formato simple bajo anotaciones 
+ * MetaDataInfoCategorias
  * @author jhuidobro
  */
 public class DatabaseMetaDataImpl implements DatabaseMetaData {

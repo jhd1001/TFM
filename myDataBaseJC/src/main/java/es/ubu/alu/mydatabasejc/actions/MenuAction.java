@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package es.ubu.alu.mydatabasejc.actions;
 
 import es.ubu.alu.mydatabasejc.Menu;
@@ -156,11 +151,14 @@ public class MenuAction extends LoginAction implements SessionAware {
                 if (metodoLink) {
                     for (String linkParametro : linkParametros)
                         if (linkParametro.equals(resultSet.getMetaData().getColumnName(j))) {
-                            if (argumentos==null)
-                                urlParametro = urlParametro + "&" + linkParametro + "=" + resultSet.getObject(j);
-                            else {
-                                urlParametro = urlParametro + "&" + argumentos + "=" + linkParametro;
-                                urlParametro = urlParametro + "&" + valores + "=" + resultSet.getObject(j);
+                            if (argumentos==null) {
+                                if (resultSet.getObject(j)!=null)
+                                    urlParametro = urlParametro + "&" + linkParametro + "=" + resultSet.getObject(j);
+                            } else {
+                                if (resultSet.getObject(j)!=null) {
+                                    urlParametro = urlParametro + "&" + argumentos + "=" + linkParametro;
+                                    urlParametro = urlParametro + "&" + valores + "=" + resultSet.getObject(j);
+                                }
                             }
                         }
                 }

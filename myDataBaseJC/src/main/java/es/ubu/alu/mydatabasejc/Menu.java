@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package es.ubu.alu.mydatabasejc;
 
 import es.ubu.alu.mydatabasejc.exceptions.MenuException;
@@ -14,7 +9,7 @@ import java.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
 
 /**
- *
+ * Gestiona los datos necesarios para mantener un opción del menu
  * @author jhuidobro
  */
 public class Menu {

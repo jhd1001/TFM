@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package es.ubu.alu.mydatabasejc.actions;
 
 import com.opensymphony.xwork2.Preparable;
@@ -259,7 +254,8 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
         Map<String, Integer> mapa = setParametrosSesion(
                 TABLE_SCHEM==null ? TABLE_NAME :
                         (TABLE_SCHEM.equals("") ? TABLE_NAME : 
-                                TABLE_SCHEM + "." + TABLE_NAME));
+                            (TABLE_SCHEM.equals("null") ? TABLE_NAME :
+                                TABLE_SCHEM + "." + TABLE_NAME)));
 
         // define el array de posibles parámetros para presentarlos en la jsp
         arrayParametros = mapa.keySet();
@@ -273,7 +269,7 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
             // se obtiene una lista con los campos primary key
             List<String> pkList = new ArrayList<>();
             String[] linkParametros = {};
-            rs2 = connectionImpl.getConnection().getMetaData().getPrimaryKeys("", TABLE_SCHEM, TABLE_NAME);
+            rs2 = connectionImpl.getConnection().getMetaData().getPrimaryKeys(null, TABLE_SCHEM==null ? "" : TABLE_SCHEM, TABLE_NAME);
             while (rs2.next()) 
                 pkList.add(rs2.getString("COLUMN_NAME"));
             if (pkList.size()!=0) metodoLink = true;

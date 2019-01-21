@@ -1,12 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package es.ubu.alu.mydatabasejc;
 
 /**
- *
+ * Se utiliza para presentar al usuario información en forma propiedad/valor
  * @author jhuidobro
  */
 public class PropiedadValor {

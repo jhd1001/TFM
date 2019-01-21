@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package es.ubu.alu.mydatabasejc.annotations;
 
 import java.lang.annotation.Documented;
@@ -12,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
+ * Define la anotación para categorizar los métodos de DatabaseMetaDataImpl
  * @author jhuidobro
  */
 @Target(ElementType.METHOD)

@@ -1,8 +1,3 @@
-/*
- * Define si los métodos a los que acompaña deben ser presentados con 
- * un link para su continuación en el seguimiento de la información
- * que pueden presentar en pantalla para cada registro devuelto
- */
 package es.ubu.alu.mydatabasejc.annotations;
 
 import java.lang.annotation.Documented;
@@ -12,7 +7,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
+ * Define la anotación para marcar los métodos de DatabaseMetaDataImpl 
+ * que deben proporcionar la información para establecer un link hacia
+ * otra pantalla y cuales han de ser los parámetros a enviar en la
+ * request de ese link
  * @author jhuidobro
  */
 @Target(ElementType.METHOD)
@@ -26,5 +24,6 @@ public @interface MetaDataLink {
     // devuelve los parametros que deben incluirse en el link,
     // en formato array String
     String[] parametros();
+    // marca el número de la columna en la que debe situarse el link
     int columnNumber();
 }
