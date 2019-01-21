@@ -12,5 +12,5 @@ public class ValoresPorDefecto {
     public static String titulo = "MyDatabaseJC";
     public static String subtitulo = "Trabajo Fin de Máster";
     public static String estudio = "Máster Universitario Online en Ingeniería Informática";
-    public static String descripcionTrabajo = "Creción de componentes para el mantenimiento web de datos en sistemas de gestión de bases de datos relacionales";
+    public static String descripcionTrabajo = "Gestión web de bases de datos relacionales";
 }
