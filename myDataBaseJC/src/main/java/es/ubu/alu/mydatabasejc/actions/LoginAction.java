@@ -62,7 +62,10 @@ public class LoginAction extends ActionSupport {
     public String validarLogin() {
         // control de validez de sesión iniciada
         HttpServletRequest request = ServletActionContext.getRequest();
-        if (request.getSession().isNew()) return ERROR;
+        if (request.getSession().isNew()) {
+            addActionError(getText("Nueva sesión de usuario"));
+            return ERROR;
+        }
         ConnectionImpl connectionImpl = (ConnectionImpl)request.getSession().getAttribute(CONEXION);
         
         return validarLogin(connectionImpl);

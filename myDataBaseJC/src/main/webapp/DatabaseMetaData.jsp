@@ -86,10 +86,30 @@
                                             </td>
                                         </s:else>
                                     </s:else>
+                                    <s:set var="numCampos" value="#stat.count"/>
                                 </s:iterator>
                             </tr>
                             <s:if test="#status.first == true"></thead></s:if>
+                            <s:set var="numRecords" value="#status.count - 1"/>
                         </s:iterator>
+                        <tr>
+                            <td colspan='<s:property value="#numCampos"/>'>
+                                <s:if test="#numRecords == numMaxRecords">
+                                    <s:form name="cambiaMaxRecords" theme="simple" >
+                                        <s:iterator value="httpParameters">
+                                            <s:set name="campo"><s:property /></s:set>
+                                            <s:if test='#campo != "numMaxRecords"'>
+                                                <s:hidden name="%{campo}"/>
+                                            </s:if>
+                                        </s:iterator>
+                                        <s:textfield name="numMaxRecords" value="%{#numRecords}"/> registros recibidos
+                                    </s:form>
+                                </s:if>
+                                <s:else>
+                                    <s:property  value="#numRecords"/> registros recibidos
+                                </s:else>
+                            </td>
+                        </tr>
                     </table>
                 </div>
             </div>

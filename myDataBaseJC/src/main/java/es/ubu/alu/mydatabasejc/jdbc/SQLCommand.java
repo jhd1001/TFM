@@ -134,7 +134,7 @@ public class SQLCommand {
             for (Object o : listaParametrosWhere) {
                 ps.setObject(parameterIndex++, o);
             }
-            ResultSet rs = null;
+            ResultSet rs = null; 
             // y se resuelve el resultset
             return ps.executeQuery();
         } catch (SQLException ex) {

@@ -275,7 +275,7 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
             if (pkList.size()!=0) metodoLink = true;
             // se transforma el resultset en una lista para su visualización
             listInfo = getListInfo(rs, metodoLink, pkList.toArray(linkParametros), "pkArgumentos", "pkValores");
-        } catch (ResultSetException | SQLException | SQLCommandException ex) {
+        } catch (SQLException | SQLCommandException ex) { //ResultSetException | 
             addActionError(ex.getMessage());
             return ERROR;
         } finally {

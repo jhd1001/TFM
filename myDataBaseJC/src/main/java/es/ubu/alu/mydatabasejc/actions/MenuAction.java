@@ -11,21 +11,39 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.apache.struts2.interceptor.ParameterAware;
 import org.apache.struts2.interceptor.SessionAware;
 
 /**
  *
  * @author jhuidobro
  */
-public class MenuAction extends LoginAction implements SessionAware {
+public class MenuAction extends LoginAction implements SessionAware, ParameterAware {
     protected String ACTION_ERROR = "ACTION_ERROR";
     protected String ACTION_MESSAGE = "ACTION_MESSAGE";
     private List<Menu> menus;
     protected String[] filtroArgumentos;
     protected String[] filtroValores;
     protected Map<String, Object> sesion;
+    protected Map<String, String[]> httpParameters;
+    private Integer numMaxRecords;
+
+    @Override
+    public void setParameters(Map<String, String[]> maps) {
+        this.httpParameters = maps;
+    }
+    
+    public Iterator<String> getHttpParameters() {
+        return httpParameters.keySet().iterator();
+    }
+
+    public Integer getNumMaxRecords() {
+        return numMaxRecords==null ? ValoresPorDefecto.numMaxRecords : numMaxRecords;
+    }
 
     protected void cierraRS(ResultSet rs, PreparedStatement ps) {
         try {
@@ -121,7 +139,7 @@ public class MenuAction extends LoginAction implements SessionAware {
      * @return
      * @throws SQLException 
      */
-    protected List<List> getListInfo(ResultSet resultSet, boolean metodoLink, String[] linkParametros, String argumentos, String valores) throws SQLException, ResultSetException {
+    protected List<List> getListInfo(ResultSet resultSet, boolean metodoLink, String[] linkParametros, String argumentos, String valores) throws SQLException {//, ResultSetException {
         List<List> lista = new ArrayList();
         // se obtiene el metadata del result set
         ResultSetMetaData rsMetadata = resultSet.getMetaData();
@@ -141,9 +159,9 @@ public class MenuAction extends LoginAction implements SessionAware {
         // a la lista del resultset
         int n = 1;
         while (resultSet.next()) {
-            // si se supera el máximo de registros, se manda error
-            if (n++>ValoresPorDefecto.numMaxRecords)
-                throw new ResultSetException(getText("Demasiados.registros.Filtrar"), resultSet);
+            // si se supera el máximo de registros, se finaliza el bucle
+            if (n++>getNumMaxRecords()) break;
+                //throw new ResultSetException(getText("Demasiados.registros.Filtrar"), resultSet);
             List record = new ArrayList();
             String urlParametro = "";
             if (metodoLink) record.add(urlParametro);
@@ -207,5 +225,7 @@ public class MenuAction extends LoginAction implements SessionAware {
     public void setFiltroArgumentos(String[] filtroArgumentos) {this.filtroArgumentos = filtroArgumentos;}
     
     public void setFiltroValores(String[] filtroValores) {this.filtroValores = filtroValores;}
+
+    public void setNumMaxRecords(Integer numMaxRecords) {this.numMaxRecords = numMaxRecords;}
 
 }
