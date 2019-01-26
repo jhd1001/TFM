@@ -122,20 +122,28 @@ public class DatabaseMetaDataAction extends MenuAction implements Preparable, Se
         for (int i = 0; i < parameterTypes.length; i++) {
             String atributo = filtroArgumentos[i];
             Object valor = null;
-            if (!"".equals(filtroValores[i]))
-                switch (parameterTypes[i].getName()) {
-                    case "[Ljava.lang.String;": 
-                        String[] valores = filtroValores[i].split(",",0); 
-                        List<String> lvalores = new ArrayList();
-                        for (int j = 0; j< valores.length; j++)
-                            if (!"".equals(valores[j])) lvalores.add(valores[j].trim());
-                        valor = lvalores.toArray(valores);
-                        break;
-                    case "boolean": valor = Boolean.valueOf(filtroValores[i]); break;
-                    case "int": valor = Integer.valueOf(filtroValores[i]); break;
-                    case "short": valor = Short.valueOf(filtroValores[i]); break;
-                    default: valor = filtroValores[i];
+            if (!"".equals(filtroValores[i])) {
+                try {
+                    switch (parameterTypes[i].getName()) {
+                        case "[Ljava.lang.String;": 
+                            String[] valores = filtroValores[i].split(",",0); 
+                            List<String> lvalores = new ArrayList();
+                            for (int j = 0; j< valores.length; j++)
+                                if (!"".equals(valores[j])) lvalores.add(valores[j].trim());
+                            valor = lvalores.toArray(valores);
+                            break;
+                        case "boolean": valor = Boolean.valueOf(filtroValores[i]); break;
+                        case "int": valor = Integer.valueOf(filtroValores[i]); break;
+                        case "short": valor = Short.valueOf(filtroValores[i]); break;
+                        default: valor = filtroValores[i];
+                    }
+                } catch (Exception e) {
+                    addActionError(
+                        getText(
+                            "Error conviertiendo valor {0} en campo {1}", 
+                            new String[]{filtroValores[i], filtroArgumentos[i]}));
                 }
+            }
             sesion.put(atributo, valor);
         }
     }

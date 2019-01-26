@@ -1,6 +1,7 @@
 $('th').click(function () {
     var table = $(this).parents('table').eq(0);
-    var rows = table.find('tr:gt(0)').toArray().sort(comparer($(this).index()));
+    var rows = table.find('tr:not(:first, :last)').toArray().sort(comparer($(this).index()));
+    
     this.asc = !this.asc;
     if (!this.asc) {
         rows = rows.reverse();
@@ -9,6 +10,8 @@ $('th').click(function () {
         table.append(rows[i]);
     }
     setIcon($(this), this.asc);
+    var r2 = table.find('tr:eq(1)');
+    table.append(r2);
 });
 
 // Para comparar los valores de la tabla entre sí

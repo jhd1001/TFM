@@ -18,6 +18,10 @@ public class SQLCommandException extends Throwable {
     private SQLCommand sqlCommand;
     final static Logger logger = (Logger) LogManager.getLogger(SQLCommandException.class);
 
+    public SQLCommandException(ConversionException ce) {
+        super(ce.getFieldName() + ": " + ce.getLocalizedMessage());
+    }
+    
     public SQLCommandException(SQLCommand aThis, int operacion) {
         super("La.operación.indicada.es.incorrecta");
         logger.error("La operación indicada es incorrecta: {}", 

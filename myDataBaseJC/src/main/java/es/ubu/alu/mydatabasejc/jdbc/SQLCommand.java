@@ -1,5 +1,6 @@
 package es.ubu.alu.mydatabasejc.jdbc;
 
+import es.ubu.alu.mydatabasejc.exceptions.ConversionException;
 import es.ubu.alu.mydatabasejc.exceptions.SQLCommandException;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -14,6 +15,7 @@ import java.util.Set;
 
 /**
  * Clase que permite al usuario ejecutar comandos sql contra la base de datos
+ *
  * @author jhuidobro
  */
 public class SQLCommand {
@@ -58,27 +60,27 @@ public class SQLCommand {
             case Types.BIGINT:
             case Types.INTEGER:
             case Types.ROWID:
-                return valor==null ? (Integer)null : Integer.valueOf(valor);
+                return valor == null ? (Integer) null : Integer.valueOf(valor);
             // para tipos Short
             case Types.SMALLINT:
-                return valor==null ? (Short)null : Short.valueOf(valor);
+                return valor == null ? (Short) null : Short.valueOf(valor);
             // para tipos boolean
             case Types.BIT:
             case Types.BOOLEAN:
-                return valor==null ? (Boolean)null : Boolean.valueOf(valor);
+                return valor == null ? (Boolean) null : Boolean.valueOf(valor);
             // para tipos fecha
             case Types.DATE:
             case Types.TIME:
             case Types.TIMESTAMP:
             case Types.TIME_WITH_TIMEZONE:
-                return valor==null ? (Date)null : Date.valueOf(valor);
+                return valor == null ? (Date) null : Date.valueOf(valor);
             // para tipos float
             case Types.DECIMAL:
             case Types.DOUBLE:
             case Types.FLOAT:
             case Types.NUMERIC:
             case Types.REAL:
-                return valor==null ? (Float)null : Float.valueOf(valor);
+                return valor == null ? (Float) null : Float.valueOf(valor);
             // para tipos string
             case Types.CHAR:
             case Types.DATALINK:
@@ -88,7 +90,7 @@ public class SQLCommand {
             case Types.NVARCHAR:
             case Types.SQLXML:
             case Types.VARCHAR:
-                return valor==null ? (String)null : valor;
+                return valor == null ? (String) null : valor;
             // en otro caso, valor por defecto
             default:
                 return valor;
@@ -134,7 +136,7 @@ public class SQLCommand {
             for (Object o : listaParametrosWhere) {
                 ps.setObject(parameterIndex++, o);
             }
-            ResultSet rs = null; 
+            ResultSet rs = null;
             // y se resuelve el resultset
             return ps.executeQuery();
         } catch (SQLException ex) {
@@ -179,7 +181,7 @@ public class SQLCommand {
         }
         return retorno;
     }
-    
+
     public Map<String, Integer[]> getMap(String TABLE_SCHEM, String TABLE_NAME) {
         // se crea un mapa vacío
         Map<String, Integer[]> mapa = new HashMap<String, Integer[]>();
@@ -213,7 +215,7 @@ public class SQLCommand {
             }
             return mapa;
         }
-        
+
     }
 
     public ResultSet executeQuery(String TABLE_SCHEM, String TABLE_NAME, Map<String, Integer[]> mapa, String[] pkArgumentos, String[] pkValores, int TYPE_SCROLL, int CONCUR) throws SQLCommandException {
@@ -243,46 +245,64 @@ public class SQLCommand {
         sql = "";
     }
 
-    private void setSQLPartList(Map<String, Integer[]> mapa, String[] pkArgumentos, String[] pkValores, int tipo) {
+    private void setSQLPartList(Map<String, Integer[]> mapa, String[] pkArgumentos, String[] pkValores, int tipo) throws SQLCommandException {
         inicializa();
         int n = 0;
         if (tipo == OPERACION_UPDATE) {
             for (String columna : pkArgumentos) {
-                Object o = getValor(mapa.get(columna)[0], pkValores[n++]);
-                //Object o = pkValores[n++];
-                if (listaParametrosSet.size() != 0) {
-                    cadenaSet = cadenaSet + ", ";
+                try {
+                    Object o = getValor(mapa.get(columna)[0], pkValores[n]);
+                    n++;
+                    //Object o = pkValores[n++];
+                    if (listaParametrosSet.size() != 0) {
+                        cadenaSet = cadenaSet + ", ";
+                    }
+                    cadenaSet = cadenaSet + columna + " = ? ";
+                    listaParametrosSet.add(o);
+                } catch (Exception e) {
+                    ConversionException ce = new ConversionException(pkArgumentos[n], e);
+                    throw new SQLCommandException(ce);
                 }
-                cadenaSet = cadenaSet + columna + " = ? ";
-                listaParametrosSet.add(o);
             }
         } else if (tipo == OPERACION_WHERE) {
             for (String columna : pkArgumentos) {
-                Object o = getValor(mapa.get(columna)[0], pkValores[n++]); //pkValores[n++];
-                if (listaParametrosWhere.size() != 0) {
-                    cadenaWhere = cadenaWhere + "AND  ";
-                } else {
-                    cadenaWhere = "where ";
+                try {
+                    Object o = getValor(mapa.get(columna)[0], pkValores[n]);
+                    n++;
+                    if (listaParametrosWhere.size() != 0) {
+                        cadenaWhere = cadenaWhere + "AND  ";
+                    } else {
+                        cadenaWhere = "where ";
+                    }
+                    cadenaWhere = cadenaWhere + columna + " = ? ";
+                    listaParametrosWhere.add(o);
+                } catch (Exception e) {
+                    ConversionException ce = new ConversionException(pkArgumentos[n], e);
+                    throw new SQLCommandException(ce);
                 }
-                cadenaWhere = cadenaWhere + columna + " = ? ";
-                listaParametrosWhere.add(o);
             }
         } else if (tipo == OPERACION_INSERT) {
             for (String columna : pkArgumentos) {
-                Object o = getValor(mapa.get(columna)[0], pkValores[n++]); //pkValores[n++];
-                if (o == null) {
-                    continue;
+                try {
+                    Object o = getValor(mapa.get(columna)[0], pkValores[n]);
+                    n++;
+                    if (o == null) {
+                        continue;
+                    }
+                    if ("".equals(String.valueOf(o))) {
+                        continue;
+                    }
+                    if (listaParametrosInsert.size() != 0) {
+                        cadenaInsert = cadenaInsert + ", ";
+                        cadenaInsert2 = cadenaInsert2 + ", ";
+                    }
+                    cadenaInsert = cadenaInsert + columna;
+                    cadenaInsert2 = cadenaInsert2 + "?";
+                    listaParametrosInsert.add(o);
+                } catch (Exception e) {
+                    ConversionException ce = new ConversionException(pkArgumentos[n], e);
+                    throw new SQLCommandException(ce);
                 }
-                if ("".equals(String.valueOf(o))) {
-                    continue;
-                }
-                if (listaParametrosInsert.size() != 0) {
-                    cadenaInsert = cadenaInsert + ", ";
-                    cadenaInsert2 = cadenaInsert2 + ", ";
-                }
-                cadenaInsert = cadenaInsert + columna;
-                cadenaInsert2 = cadenaInsert2 + "?";
-                listaParametrosInsert.add(o);
             }
         } else {
             ;// errror
@@ -297,27 +317,39 @@ public class SQLCommand {
      * @param campos
      * @param valores
      */
-    private void setSQLPartList(Map<String, Integer[]> mapa, String[] pkArgumentos, String[] pkValores, String[] campos, String[] valores) {
+    private void setSQLPartList(Map<String, Integer[]> mapa, String[] pkArgumentos, String[] pkValores, String[] campos, String[] valores) throws SQLCommandException {
         inicializa();
         int n = 0;
         for (String columna : campos) {
-            Object o = getValor(mapa.get(columna)[0], valores[n++]); //valores[n++];
-            if (listaParametrosSet.size() != 0) {
-                cadenaSet = cadenaSet + ", ";
+            try {
+                Object o = getValor(mapa.get(columna)[0], valores[n]);
+                n++;
+                if (listaParametrosSet.size() != 0) {
+                    cadenaSet = cadenaSet + ", ";
+                }
+                cadenaSet = cadenaSet + columna + " = ? ";
+                listaParametrosSet.add(o);
+            } catch (Exception e) {
+                ConversionException ce = new ConversionException(campos[n], e);
+                throw new SQLCommandException(ce);
             }
-            cadenaSet = cadenaSet + columna + " = ? ";
-            listaParametrosSet.add(o);
         }
         n = 0;
         for (String columna : pkArgumentos) {
-            Object o = getValor(mapa.get(columna)[0], pkValores[n++]); //pkValores[n++];
-            if (listaParametrosWhere.size() != 0) {
-                cadenaWhere = cadenaWhere + "AND  ";
-            } else {
-                cadenaWhere = "where ";
+            try {
+                Object o = getValor(mapa.get(columna)[0], pkValores[n]);
+                n++;
+                if (listaParametrosWhere.size() != 0) {
+                    cadenaWhere = cadenaWhere + "AND  ";
+                } else {
+                    cadenaWhere = "where ";
+                }
+                cadenaWhere = cadenaWhere + columna + " = ? ";
+                listaParametrosWhere.add(o);
+            } catch (Exception e) {
+                ConversionException ce = new ConversionException(pkArgumentos[n], e);
+                throw new SQLCommandException(ce);
             }
-            cadenaWhere = cadenaWhere + columna + " = ? ";
-            listaParametrosWhere.add(o);
         }
     }
 
