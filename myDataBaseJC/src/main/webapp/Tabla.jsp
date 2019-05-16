@@ -50,17 +50,17 @@
                                             <s:else>
                                                 <td>
                                                     <ul class="bqY ocultar">
-                                                        <s:url action="borrar" var="urlBru" includeParams="get" escapeAmp="false"/>
+                                                        <s:url action="borrar" var="urlBru" includeParams="all" escapeAmp="false" />
                                                         <s:set var="url"><s:property value="urlBru"/>&<s:property/></s:set>
                                                         <li class="bqX" title="<s:property value='%{ayuda("borrar.registro")}'/>">
                                                             <s:a  href="%{url}" class="acciones bru">&nbsp;&nbsp;</s:a>
                                                         </li>
-                                                        <s:url action="editar" var="urlEdt" includeParams="get" escapeAmp="false"/>
+                                                        <s:url action="editar" var="urlEdt" includeParams="all" escapeAmp="false"/>
                                                         <s:set var="urle"><s:property value="urlEdt"/>&<s:property/></s:set>
                                                         <li class="bqX" title="<s:property value='%{ayuda("update.registro")}'/>">
                                                             <s:a  href="%{urle}" class="acciones edt">&nbsp;&nbsp;</s:a>
                                                         </li>
-                                                        <s:url action="insertar" var="urlIns" includeParams="get" escapeAmp="false"/>
+                                                        <s:url action="insertar" var="urlIns" includeParams="all" escapeAmp="false"/>
                                                         <li class="bqX" title="<s:property value='%{ayuda("insert.registro")}'/>">
                                                             <s:a  href="%{urlIns}" class="acciones ins">&nbsp;&nbsp;</s:a>
                                                         </li>

@@ -67,8 +67,11 @@
             </result>
         </action>
         <action name="borrar" class="es.ubu.alu.mydatabasejc.actions.TablasAction" method="borrar">
-            <result name="consulta" type="chain">
+            <result name="consulta" type="redirectAction"> <!--chain"-->
                 <param name="actionName">consulta</param>
+                <param name="TABLE_SCHEM">%{TABLE_SCHEM}</param>
+                <param name="TABLE_NAME">%{TABLE_NAME}</param>
+                <param name="suppressEmptyParameters">true</param>
             </result>
             <result name="tablas" type="redirectAction">
                 <param name="actionName">resultset</param>

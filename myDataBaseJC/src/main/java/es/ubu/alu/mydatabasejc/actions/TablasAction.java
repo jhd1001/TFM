@@ -201,7 +201,7 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
         // para cada columna del resultset
         for (String columna : set) {
             try {
-                String atributo = TABLE_SCHEM + "." + TABLE_NAME + "." + filtroArgumentos[i];
+                String atributo = tabla + "." + filtroArgumentos[i]; //TABLE_SCHEM + "." + TABLE_NAME + "." + filtroArgumentos[i];
                 Object valor = null;
                 // si el valor recibido no está en blanco
                 if (!"".equals(filtroValores[i])) 

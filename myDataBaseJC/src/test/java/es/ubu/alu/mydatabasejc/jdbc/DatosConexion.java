@@ -10,7 +10,7 @@ package es.ubu.alu.mydatabasejc.jdbc;
  * @author jhuidobro
  */
 public class DatosConexion {
-    protected String url = "";
-    protected String usuario = "";
-    protected String password = "";
+    protected String url = "jdbc:mysql://localhost:3306/mysql?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+    protected String usuario = "jha";
+    protected String password = "jha";
 }
