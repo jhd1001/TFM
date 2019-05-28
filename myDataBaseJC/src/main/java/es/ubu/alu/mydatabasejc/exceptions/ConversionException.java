@@ -11,8 +11,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
 /**
- *
- * @author jhuidobro
+ * Excepción producida al convertir un valor al tipo de objeto requerido
+ * por un campo JDBC
+ * 
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 public class ConversionException extends Throwable {
     final static Logger logger = (Logger) LogManager.getLogger(ConversionException.class);

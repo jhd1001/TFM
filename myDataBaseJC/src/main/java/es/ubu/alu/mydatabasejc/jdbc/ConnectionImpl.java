@@ -10,7 +10,9 @@ import java.util.logging.Logger;
 
 /**
  * Establece y manteniene la información de una conexión con la base de datos
- * @author jhuidobro
+ * 
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 public class ConnectionImpl {
     protected Connection connection;
@@ -108,7 +110,7 @@ public class ConnectionImpl {
     /**
      * Cuando el objeto es recolectado para su destrucción, se cierra
      * la conexión con la base de datos, si es que existía alguna.
-     * @throws Throwable 
+     * @throws Throwable si se produce un error Throwable 
      */
     @Override
     protected void finalize() throws Throwable {

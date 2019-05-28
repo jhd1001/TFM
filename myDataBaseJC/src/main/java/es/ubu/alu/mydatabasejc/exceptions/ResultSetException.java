@@ -11,8 +11,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
 /**
- *
- * @author jhuidobro
+ * Excepción para el tratamiento de errores en la ejecución de métodos
+ * sobre un resultset
+ * 
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 public class ResultSetException extends Throwable {
     final static Logger logger = (Logger) LogManager.getLogger(ResultSetException.class);
@@ -30,6 +33,8 @@ public class ResultSetException extends Throwable {
      * specified detail message.
      *
      * @param msg the detail message.
+     * @param resultSet resultset que provoca la excepción
+     * @throws SQLException si error SQL
      */
     public ResultSetException(String msg, ResultSet resultSet) throws SQLException {
         super(msg);

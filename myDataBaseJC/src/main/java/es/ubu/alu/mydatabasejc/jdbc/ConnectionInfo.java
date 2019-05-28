@@ -8,7 +8,9 @@ import java.util.Properties;
 
 /**
  * Define los métodos informativos de la conexión
- * @author jhuidobro
+ * 
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 public class ConnectionInfo {
     protected Connection connection;

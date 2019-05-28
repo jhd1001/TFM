@@ -13,8 +13,11 @@ import java.util.Set;
 import org.apache.struts2.interceptor.SessionAware;
 
 /**
- *
- * @author jhuidobro
+ * Gestiona las acciones struts que manejan tablas y sus datos proporcionando
+ * operaciones básica sobre ellos
+ * 
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 public class TablasAction extends MenuAction implements Preparable, SessionAware {
 
@@ -33,6 +36,12 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
     private Map<String, Integer> mapaEditables;
     private Map<String, Integer[]> mapaCompleto;
 
+    /**
+     * Determina si un campo dado es editable
+     * 
+     * @param campo Nombre del campo a consultar
+     * @return true si el campo es editable. false en caso contrario
+     */
     public boolean isEditDisabled(String campo) {
         for (String campoWritable : mapaEditables.keySet()) {
             if (campoWritable.equalsIgnoreCase(campo)) {
@@ -42,6 +51,14 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
         return true;
     }
 
+    /**
+     * Permite guardar los datos en una operación de inserción de un
+     * registro en una tabla concreta
+     * 
+     * @return "tablas" si no existe la tabla indicada
+     * "consulta" si no hay datos que insertar
+     * insertar() en caso contrario
+     */
     public String insertarGuardar() {
         if (TABLE_NAME == null || "".equals(TABLE_NAME)) {
             sesion.put(ACTION_ERROR, "Faltan.esquema.o.nombre.de.tabla");
@@ -66,6 +83,12 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
         return "consulta";
     }
 
+    /**
+     * Inserta los datos recibidos en la tabla indicada
+     * 
+     * @return "tabla" si no existe la tabla en cuestión
+     * "success" en caso contrario
+     */
     public String insertar() {
         if (TABLE_NAME == null || "".equals(TABLE_NAME)) {
             sesion.put(ACTION_ERROR, "Faltan.esquema.o.nombre.de.tabla");
@@ -79,10 +102,24 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
         return SUCCESS;
     }
 
+    /**
+     * Obtiene el valor del campo i de la clave primaria
+     * @param i número de campo
+     * @return objeto correspondiente al campo i
+     */
     public Object getPkValores(int i) {
         return pkValores == null ? null : (i >= pkValores.length ? null : pkValores[i]);
     }
 
+    /**
+     * Permite guardar los datos recibidos del registro indicado en
+     * la tabla establecida
+     * 
+     * @return "tablas" si no se indica la tabla
+     * "consulta" si no se indica los campos de la PKK
+     * "consulta" si no se indican los datos a guardar
+     * "consulta" si se guardan correctamente
+     */
     public String editarGuardar() {
         if (TABLE_NAME == null || "".equals(TABLE_NAME)) {
             sesion.put(ACTION_ERROR, "Faltan.esquema.o.nombre.de.tabla");
@@ -111,6 +148,15 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
         return "consulta";
     }
 
+    /**
+     * Carga los datos del registro a editar para presentarlos en 
+     * pantalla
+     * 
+     * @return "tablas" si no se indica la tabla
+     * "consulta" si no se indica la PK
+     * "error" si se produce algún error en tiempo de ejecución
+     * "success" si se localiza correctamente el registro
+     */
     public String editar() {
         if (TABLE_NAME == null || "".equals(TABLE_NAME)) {
             sesion.put(ACTION_ERROR, "Faltan.esquema.o.nombre.de.tabla");
@@ -182,7 +228,7 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
      * objeto map con este nombre. Contendrá un mapa de los campos del resultset
      * y su tipo
      * @return mapa del resultset de la tabla con
-     * @throws SQLException
+     * @throws SQLException si error SQLException 
      */
     private Map<String, Integer> setParametrosSesion(String tabla) { 
         // obtiene el mapa de campos de búsqueda
@@ -224,7 +270,8 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
      * Consulta la tabla recibida en TABLE_NAME y en TABLE_SCHEM y la presenta
      * en jsp en forma de lista
      *
-     * @return
+     * @return "back" si no se proporciona nombre de tabla
+     * "success" en caso contrario
      */
     public String consulta() {
         // Recoge los mensajes de error previos y los establece en esta acción
@@ -320,7 +367,7 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
     /**
      * Se obtiene la conexión de la sesión del usuario
      *
-     * @throws Exception
+     * @throws Exception si Exception 
      */
     @Override
     public void prepare() throws Exception {

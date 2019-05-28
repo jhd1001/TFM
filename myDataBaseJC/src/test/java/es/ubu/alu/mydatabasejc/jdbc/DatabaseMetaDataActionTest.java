@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package es.ubu.alu.mydatabasejc.jdbc;
 
 import es.ubu.alu.mydatabasejc.PropiedadValor;
@@ -19,8 +14,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 
 /**
- *
- * @author jhuidobro
+ * Test de las acciones struts de manejo de objetos DatabaseMetaData
+ * 
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 public class DatabaseMetaDataActionTest extends DatosConexion {
     DatabaseMetaDataAction action;

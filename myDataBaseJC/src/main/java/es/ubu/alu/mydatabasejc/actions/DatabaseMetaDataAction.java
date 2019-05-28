@@ -23,8 +23,10 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.struts2.interceptor.SessionAware;
 
 /**
- *
- * @author jhuidobro
+ * Gestiona las acciones relacionadas con el objeto DatabaseMetaData
+ * de la conexión JDBC
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 public class DatabaseMetaDataAction extends MenuAction implements Preparable, SessionAware {
 
@@ -163,11 +165,11 @@ public class DatabaseMetaDataAction extends MenuAction implements Preparable, Se
      * @param metodo Nombre del método a invocar
      * @param parametros Array de clases que conforman los parámetros del método
      * codificado en Base64
-     * @return
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
+     * @return Objeto resultado de invoca el método
+     * @throws IllegalAccessException si error IllegalAccessException
+     * @throws IllegalArgumentException si error IllegalArgumentException
+     * @throws NoSuchMethodException si error NoSuchMethodException
+     * @throws InvocationTargetException si error InvocationTargetException
      * @throws DatabaseMetaDataException Si el resultado de la ejecución del método
      * no produce un objeto de tipo ResultSet se genera una excepción de este tipo
      */
@@ -219,6 +221,10 @@ public class DatabaseMetaDataAction extends MenuAction implements Preparable, Se
         super.validarLogin(connectionImpl);
     }
 
+    /**
+     * Método inicial de carga de información de la conexión JDBC
+     * @return "success"
+     */
     public String inicial() {
         // Modela la clase de información de la conexión para su presentación
         ConnectionInfo connectionInfo = new ConnectionInfo(connectionImpl.getConnection());
@@ -249,7 +255,7 @@ public class DatabaseMetaDataAction extends MenuAction implements Preparable, Se
     /**
      * Se obtiene la conexión de la sesión del usuario
      *
-     * @throws Exception
+     * @throws Exception si no puede conseguir la conexión
      */
     @Override
     public void prepare() throws Exception {

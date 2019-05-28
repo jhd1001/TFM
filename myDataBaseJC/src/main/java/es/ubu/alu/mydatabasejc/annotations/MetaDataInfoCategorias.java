@@ -8,7 +8,9 @@ import java.lang.annotation.Target;
 
 /**
  * Define la anotación para categorizar los métodos de DatabaseMetaDataImpl
- * @author jhuidobro
+ * 
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

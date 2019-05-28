@@ -14,8 +14,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.struts2.ServletActionContext;
 
 /**
- *
- * @author jhuidobro
+ * Clase que gestiona las acciones relacionadas con el login y el 
+ * control de acceso del usuario a la base de datos
+ * 
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 public class LoginAction extends ActionSupport {
     protected String CONEXION = "conexion";
@@ -23,6 +26,11 @@ public class LoginAction extends ActionSupport {
     private String usuario;
     private String password;
 
+    /**
+     * Obtiene el texto de la ayuda para una propiedad determinada
+     * @param propiedad nombre de la propiedad
+     * @return La propiedad idiomatizada
+     */
     public String ayuda(String propiedad) {
         ResourceBundle myResources = null;
         try {

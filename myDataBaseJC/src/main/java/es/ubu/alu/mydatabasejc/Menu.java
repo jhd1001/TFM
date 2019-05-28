@@ -10,7 +10,8 @@ import org.apache.commons.codec.binary.Base64;
 
 /**
  * Gestiona los datos necesarios para mantener un opción del menu
- * @author jhuidobro
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 public class Menu {
 
@@ -48,6 +49,13 @@ public class Menu {
         this.parametros = parametros;
     }
 
+    /**
+     * Consturye un objeto Menu a partir de los parámetros indicados. 
+     * Transforma Class[] parametros en un String
+     * @param action Acción a ejecutar
+     * @param metodo Método a ejecutar vía reflection
+     * @param parametros array de parámetros que necesita el método
+     */
     public Menu(String action, String metodo, Class[] parametros) {
         ObjectOutputStream os = null;
         try {

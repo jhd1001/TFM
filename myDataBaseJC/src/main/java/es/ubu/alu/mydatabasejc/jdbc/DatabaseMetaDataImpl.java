@@ -21,7 +21,9 @@ import java.util.List;
  * los métodos necesraios para agrupar los que devuelven
  * información en formato simple bajo anotaciones 
  * MetaDataInfoCategorias
- * @author jhuidobro
+ * 
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 public class DatabaseMetaDataImpl implements DatabaseMetaData {
 

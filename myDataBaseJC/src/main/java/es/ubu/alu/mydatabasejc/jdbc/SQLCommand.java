@@ -16,7 +16,8 @@ import java.util.Set;
 /**
  * Clase que permite al usuario ejecutar comandos sql contra la base de datos
  *
- * @author jhuidobro
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 public class SQLCommand {
 
@@ -44,6 +45,14 @@ public class SQLCommand {
     public String cadenaInsert2;
     public List<Object> listaParametrosInsert;
 
+    /**
+     * Dado un tipo de datos Java, devuelve el objeto valor convertido
+     * a dicho tipo
+     * 
+     * @param tipo Tipo de dato JDBC
+     * @param valor Valor asignable al campo
+     * @return Devuelve el valor adaptado al tipo indicado
+     */
     public static Object getValor(int tipo, String valor) {
         valor = valor==null ? null : ("".equals(valor) ? null : valor);
         switch (tipo) {
@@ -97,6 +106,17 @@ public class SQLCommand {
         }
     }
 
+    /**
+     * Ejecuta una operación de inserción SQL 
+     * 
+     * @param esquema Esquema de la base de datos
+     * @param tabla Tabla
+     * @param mapa Proporciona los tipos Java de los datos a insertar
+     * @param campos Nombre de los campos a insertar
+     * @param valores Valores en formato String de los campos a insertar
+     * @return Número de registros insertados
+     * @throws SQLCommandException si error SQLException 
+     */
     public int executeUpdate(String esquema, String tabla, Map<String, Integer[]> mapa, String[] campos, String[] valores) throws SQLCommandException {
         int retorno = 0;
         setSQLPartList(mapa, campos, valores, OPERACION_INSERT);
@@ -124,6 +144,16 @@ public class SQLCommand {
         return retorno;
     }
 
+    /**
+     * Ejecuta el comando SELECT * de SQL correspondiente
+     * 
+     * @param TABLE_SCHEM Esquema
+     * @param TABLE_NAME Tabla
+     * @param TYPE_SCROLL Tipo de scroll
+     * @param CONCUR Tipo de acceso concurrente
+     * @return Resultset con el resultado del comando
+     * @throws SQLCommandException si Error SQLException
+     */
     private ResultSet executeQuery(String TABLE_SCHEM, String TABLE_NAME, int TYPE_SCROLL, int CONCUR) throws SQLCommandException {
         // Se obtiene la cadena de consulta definitiva
         String sql = String.format("SELECT * FROM %s%s %s", getEsquema(TABLE_SCHEM), TABLE_NAME, cadenaWhere);
@@ -144,6 +174,17 @@ public class SQLCommand {
         }
     }
 
+    /**
+     * Ejecuta el comando SELECT * de tipo FORWARD_ONLY y CONCUR_READ_ONLY
+     * de SQL 
+     * @param TABLE_SCHEM esquema
+     * @param TABLE_NAME tabla
+     * @param arrayParametros conjunto de columnas que intervienen en la cláusula where
+     * @param sesion Mapa donde se encuentran los valores correspondientes a
+     * cada uno de los elementos del array de parametros indicado
+     * @return Resultset resón del comando
+     * @throws SQLCommandException si error SQL
+     */
     public ResultSet executeQuery(String TABLE_SCHEM, String TABLE_NAME, Set<String> arrayParametros, Map<String, Object> sesion) throws SQLCommandException {
         setSQLPartList(TABLE_SCHEM, TABLE_NAME, arrayParametros, sesion);
         return executeQuery(TABLE_SCHEM, TABLE_NAME, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -173,6 +214,15 @@ public class SQLCommand {
         }
     }
 
+    /**
+     * Extrae del mapa un nuevo mapa con el nombre de la clave y el primer
+     * elemento del array de enteros proporcionado (corresponden a los tipos
+     * Java de los campos indicados)
+     * 
+     * @param mapa Mapa con nombres de campos y tipos de datos Java
+     * @param tipo Solo extrae cuando <pre>tipo &#60;&#62; 0</pre>
+     * @return Mapa de campos, con tipos de datos y tipos de los campos
+     */
     public Map<String, Integer> getMap(Map<String, Integer[]> mapa, int tipo) {
         Map<String, Integer> retorno = new HashMap<String, Integer>();
         for (String columna : mapa.keySet()) {
@@ -182,6 +232,16 @@ public class SQLCommand {
         return retorno;
     }
 
+    /**
+     * Obtiene el mapa de campos y tipos de datos JDBC (Java) del resultset
+     * obtenido tras un SELECT * FROM de la tabla recibida.
+     * 
+     * @param TABLE_SCHEM esquema
+     * @param TABLE_NAME tabla
+     * @return La clave es el nombre del campo, el primer elemento del 
+     * array de enteros es el tipo JDBC del campo y el segundo elemento del 
+     * array indica el conjunto de características de dicho campo.
+     */
     public Map<String, Integer[]> getMap(String TABLE_SCHEM, String TABLE_NAME) {
         // se crea un mapa vacío
         Map<String, Integer[]> mapa = new HashMap<String, Integer[]>();
@@ -218,6 +278,19 @@ public class SQLCommand {
 
     }
 
+    /**
+     * Ejecuta la consulta de sql sobre la tabla indicada
+     * 
+     * @param TABLE_SCHEM esquema
+     * @param TABLE_NAME tabla
+     * @param mapa Conjunto de campos incluidos en la cláusula select
+     * @param pkArgumentos Conjunto de campos de la PK
+     * @param pkValores Valores de los campos de la PK a consultar
+     * @param TYPE_SCROLL tipo de scroll
+     * @param CONCUR tipo de acceso concurrente
+     * @return Resultset resultado de la ejecución del comando
+     * @throws SQLCommandException si error SQL
+     */
     public ResultSet executeQuery(String TABLE_SCHEM, String TABLE_NAME, Map<String, Integer[]> mapa, String[] pkArgumentos, String[] pkValores, int TYPE_SCROLL, int CONCUR) throws SQLCommandException {
         setSQLPartList(mapa, pkArgumentos, pkValores, OPERACION_WHERE);
         return executeQuery(TABLE_SCHEM, TABLE_NAME, TYPE_SCROLL, CONCUR);
@@ -312,10 +385,10 @@ public class SQLCommand {
     /**
      * Siempre será update
      *
-     * @param pkArgumentos
-     * @param pkValores
-     * @param campos
-     * @param valores
+     * @param pkArgumentos Lsta de campos del PK
+     * @param pkValores Lista de valores del PK
+     * @param campos Lista de campos
+     * @param valores Lista de valores
      */
     private void setSQLPartList(Map<String, Integer[]> mapa, String[] pkArgumentos, String[] pkValores, String[] campos, String[] valores) throws SQLCommandException {
         inicializa();
@@ -366,6 +439,24 @@ public class SQLCommand {
         return esquema;
     }
 
+    /**
+     * Ejecuta una instrucción UPDATE o DELETE SQL con las condiciones
+     * establecidas por los parámetros
+     * 
+     * @param esquema Esquema
+     * @param tabla Tabla
+     * @param mapa Conjunto de campos que se actualizarán en la operación
+     * UPDATE junto con sus tipos de datos
+     * @param operacion Tipo de operación: UPDATE o DELETE
+     * @param pkArgumentos Campos de la PK
+     * @param pkValores Valores de los campos de la PK
+     * @param campos Conjunto de campos que se actualizarán en la operación
+     * UPDATE
+     * @param valores Valores asignados al conjunto de campos que se actualizarán
+     * en la operación UPDATE
+     * @return Número de registros actualizados en la operación.
+     * @throws SQLCommandException si error SQL
+     */
     public int executeUpdate(String esquema, String tabla, Map<String, Integer[]> mapa, int operacion, String[] pkArgumentos, String[] pkValores, String[] campos, String[] valores) throws SQLCommandException { //throws Exception {
         int retorno = 0;
         if (operacion == OPERACION_UPDATE) {

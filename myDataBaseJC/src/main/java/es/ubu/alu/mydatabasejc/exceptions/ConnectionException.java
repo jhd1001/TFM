@@ -7,7 +7,9 @@ import org.apache.logging.log4j.core.Logger;
 
 /**
  * Excepciones producidas en la conexión con la base de datos
- * @author jhuidobro
+ * 
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 public class ConnectionException extends Throwable {
     final static Logger logger = (Logger) LogManager.getLogger(ConnectionException.class);
@@ -31,6 +33,7 @@ public class ConnectionException extends Throwable {
      * specified detail message.
      *
      * @param msg the detail message.
+     * @param connectionImpl Objeto con la conexión
      */
     public ConnectionException(String msg, ConnectionImpl connectionImpl) {
         super(msg);

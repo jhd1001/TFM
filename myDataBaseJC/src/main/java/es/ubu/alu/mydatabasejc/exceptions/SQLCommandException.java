@@ -11,8 +11,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
 /**
- *
- * @author jhuidobro
+ * Excepción para el tratamiento de errores sobre métodos de la clase
+ * SQLCommand
+ * 
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 public class SQLCommandException extends Throwable {
     private SQLCommand sqlCommand;

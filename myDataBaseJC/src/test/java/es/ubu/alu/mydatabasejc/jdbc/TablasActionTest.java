@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author jhuidobro
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
  */
 public class TablasActionTest extends DatosConexion {
     TablasAction action;

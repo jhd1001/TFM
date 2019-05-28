@@ -3,7 +3,8 @@ package es.ubu.alu.mydatabasejc;
 /**
  * Esta clase contiene una serie de valores de configuración de la aplicación
  * de uso general que pueden ser modificados por el usuario en el futuro
- * @author jhuidobro
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 public class ValoresPorDefecto {
     public static int numMaxRecords = 1000;

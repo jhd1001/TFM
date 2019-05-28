@@ -19,8 +19,11 @@ import org.apache.struts2.interceptor.ParameterAware;
 import org.apache.struts2.interceptor.SessionAware;
 
 /**
- *
- * @author jhuidobro
+ * Gestiona las acciones struts dependientes del menú de opciones
+ * del usuario
+ * 
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 public class MenuAction extends LoginAction implements SessionAware, ParameterAware {
     protected String ACTION_ERROR = "ACTION_ERROR";
@@ -57,47 +60,37 @@ public class MenuAction extends LoginAction implements SessionAware, ParameterAw
             ;
         }
     }
-    
-      /**
-     * Obtiene en una List<List> el resultset recibido. El primer elemento de
-     * la lista representa los nombres de los campos del resultset subyacente
-     * @param resultSet Resultset a convertir en List<List>
-     * @param metodoLink Indica si el método que proporciona el resultset debe
-     * tener un link cuando sea presentado en la jsp (true) o no (false)
-     * @linkParametros Cuando se requiera incluir una columna de link (metodoLink = true)
-     * se deberán indicar en este argumento la lista de parámetros que se deben
-     * incluir en la primera columna de la lista con la información requerida 
-     * para realizar el link correctamente.
-     * @return
-     * @throws SQLException 
-     */
+
+/**
+ * Obtiene en una List de List el resultset recibido. El primer elemento de
+ * la lista representa los nombres de los campos del resultset subyacente
+ * @param resultSet Resultset a convertir en List de List
+ * @param metodoLink Indica si el método que proporciona el resultset debe
+ * tener un link cuando sea presentado en la jsp (true) o no (false)
+ * @param linkParametros Cuando se requiera incluir una columna de link (metodoLink = true)
+ * se deberán indicar en este argumento la lista de parámetros que se deben
+ * incluir en la primera columna de la lista con la información requerida 
+ * para realizar el link correctamente.
+ * @return resultset en forma de lista de lista de valores. La primera fila contiene 
+ * el nombre del campo
+ * @throws SQLException si error de tipo SQL
+ * @throws ResultSetException si error de tipo ResultSetException
+ */    
     protected List<List> getListInfo(ResultSet resultSet, boolean metodoLink, String[] linkParametros) throws SQLException, ResultSetException {
         return getListInfo(resultSet, metodoLink, linkParametros, null, null);
     }
     
    /**
-     * Obtiene en una List<List> el resultset recibido. Los elementos de la lista
+     * Obtiene en una List de List el resultset recibido. Los elementos de la lista
      * están organizados en forma de formulario, el primer elemento contiene el
      * nombre del campo, el segundo contiene el valor. En principio pensado para
      * resultset con un solo registro, aunque si tuviera más no cambiaría la 
      * organización de los datos.
-     * @param resultSet Resultset a convertir en List<List>
-     * @param metodoLink Indica si el método que proporciona el resultset debe
-     * tener un link cuando sea presentado en la jsp (true) o no (false)
-     * @param linkParametros Cuando se requiera incluir una columna de link (metodoLink = true)
-     * se deberán indicar en este argumento la lista de parámetros que se deben
-     * incluir en la primera columna de la lista con la información requerida 
-     * para realizar el link correctamente.
-     * @param argumentos Si este parametro es null, la primera columna contendrá
-     * la cedena de la forma linkParmetro1=valor1&linkParametro2=valor2. Pero si 
-     * este parametro no es nulo la cadena será de la forma [argumentos]=linkParametro1&
-     * [valores]=valor1&[argumentos]=linkParametro2&[valores]=valor2
-     * @param valores Contiene el nombre del parámetro bajo el que se incluyen los
-     * valores
-     * @return
-     * @throws SQLException 
+     * @param resultSet Resultset a convertir en List de List
+     * @return Resultset en la forma lista de lista. El primer elemento de cada
+     * lista contiene el ombre del campo correspondiente
      */
-    protected List<List> getListInfoReverse(ResultSet resultSet) { //throws SQLException, ResultSetException {
+    protected List<List> getListInfoReverse(ResultSet resultSet) { 
         try {
         ResultSetMetaData rsMetadata = resultSet.getMetaData();
         List<List> lista = new ArrayList();
@@ -121,9 +114,9 @@ public class MenuAction extends LoginAction implements SessionAware, ParameterAw
     }
     
    /**
-     * Obtiene en una List<List> el resultset recibido. El primer elemento de
+     * Obtiene en una List de List el resultset recibido. El primer elemento de
      * la lista representa los nombres de los campos del resultset subyacente
-     * @param resultSet Resultset a convertir en List<List>
+     * @param resultSet Resultset a convertir en List de List
      * @param metodoLink Indica si el método que proporciona el resultset debe
      * tener un link cuando sea presentado en la jsp (true) o no (false)
      * @param linkParametros Cuando se requiera incluir una columna de link (metodoLink = true)
@@ -131,15 +124,17 @@ public class MenuAction extends LoginAction implements SessionAware, ParameterAw
      * incluir en la primera columna de la lista con la información requerida 
      * para realizar el link correctamente.
      * @param argumentos Si este parametro es null, la primera columna contendrá
-     * la cedena de la forma linkParmetro1=valor1&linkParametro2=valor2. Pero si 
-     * este parametro no es nulo la cadena será de la forma [argumentos]=linkParametro1&
-     * [valores]=valor1&[argumentos]=linkParametro2&[valores]=valor2
+     * la cedena de la forma 
+     * <pre>linkParmetro1=valor1&#38;linkParametro2=valor2</pre>. Pero si 
+     * este parametro no es nulo la cadena será de la forma <pre>[argumentos]=linkParametro1&#38;
+     * [valores]=valor1&#38;[argumentos]=linkParametro2&#38;[valores]=valor2</pre>
      * @param valores Contiene el nombre del parámetro bajo el que se incluyen los
      * valores
-     * @return
-     * @throws SQLException 
+     * @return Resultset en forma de lista de listas. La primera lista contiene
+     * los nombres de campos
+     * @throws SQLException si error SQLException 
      */
-    protected List<List> getListInfo(ResultSet resultSet, boolean metodoLink, String[] linkParametros, String argumentos, String valores) throws SQLException {//, ResultSetException {
+    protected List<List> getListInfo(ResultSet resultSet, boolean metodoLink, String[] linkParametros, String argumentos, String valores) throws SQLException {
         List<List> lista = new ArrayList();
         // se obtiene el metadata del result set
         ResultSetMetaData rsMetadata = resultSet.getMetaData();
@@ -188,7 +183,7 @@ public class MenuAction extends LoginAction implements SessionAware, ParameterAw
         return lista;
     }
     
-    public List<Menu> getMenus() { //throws IOException {
+    public List<Menu> getMenus() { 
         // inicia la lista de valores del menu
         menus = new ArrayList<>();
         // A continuación obtiene los métodos de la MetaData que devuelven

@@ -11,7 +11,9 @@ import java.lang.annotation.Target;
  * que deben proporcionar la información para establecer un link hacia
  * otra pantalla y cuales han de ser los parámetros a enviar en la
  * request de ese link
- * @author jhuidobro
+ * 
+ * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
+ * @version 1.0
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
