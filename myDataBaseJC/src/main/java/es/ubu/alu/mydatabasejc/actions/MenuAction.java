@@ -3,7 +3,6 @@ package es.ubu.alu.mydatabasejc.actions;
 import es.ubu.alu.mydatabasejc.Menu;
 import es.ubu.alu.mydatabasejc.ValoresPorDefecto;
 import es.ubu.alu.mydatabasejc.exceptions.ResultSetException;
-import es.ubu.alu.mydatabasejc.jdbc.ConnectionImpl;
 import es.ubu.alu.mydatabasejc.jdbc.DatabaseMetaDataImpl;
 import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
@@ -11,10 +10,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.apache.struts2.interceptor.ParameterAware;
 import org.apache.struts2.interceptor.SessionAware;
 
@@ -183,6 +182,13 @@ public class MenuAction extends LoginAction implements SessionAware, ParameterAw
         return lista;
     }
     
+    /**
+     * Obtiene la lista de menún de la aplicación formada por los métodos
+     * de DatabaseMetaDataImpl que sean devuelvan un tipo resultset o un tipo
+     * info
+     * 
+     * @return Lista de menús de la aplicación
+     */
     public List<Menu> getMenus() { 
         // inicia la lista de valores del menu
         menus = new ArrayList<>();
@@ -199,7 +205,8 @@ public class MenuAction extends LoginAction implements SessionAware, ParameterAw
                     Menu menu = new Menu(
                             method.getReturnType()==ResultSet.class ? "resultset" : "info",
                             method.getName(), 
-                            method.getParameterTypes());
+                            method.getParameterTypes(),
+                            getText(method.getName()));
                     // lo busca en la lista
                     if ((index = menus.indexOf(menu))==-1) {
                         // y lo añade el nombre del método a la lista si no existe aún
@@ -207,6 +214,7 @@ public class MenuAction extends LoginAction implements SessionAware, ParameterAw
                     }
             }
         }
+        Collections.sort(menus);
         return menus;
     }
 

@@ -44,7 +44,7 @@
                                         <s:if test="#stat.first == true && metodoLink">
                                             <!-- primera fila -->
                                             <s:if test="#status.first == true">
-                                                <th><s:text name=""/></th>
+                                                <th><s:text name="Opciones"/></th>
                                             </s:if>
                                             <!-- resto de filas -->
                                             <s:else>

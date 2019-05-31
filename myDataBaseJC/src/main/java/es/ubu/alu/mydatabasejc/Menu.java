@@ -13,11 +13,12 @@ import org.apache.commons.codec.binary.Base64;
  * @author <A HREF="mailto:jhd1001@alu.ubu.es">José Ignacio Huidobro</A>
  * @version 1.0
  */
-public class Menu {
+public class Menu implements Comparable<Menu> {
 
     private String action;
     private String metodo;
     private String parametros;
+    private String i18n;
 
     public String getAction() {
         return action;
@@ -43,10 +44,11 @@ public class Menu {
         this.parametros = parametros;
     }
 
-    public Menu(String action, String metodo, String parametros) {
+    public Menu(String action, String metodo, String parametros, String i18n) {
         this.action = action;
         this.metodo = metodo;
         this.parametros = parametros;
+        this.i18n = i18n;
     }
 
     /**
@@ -56,7 +58,7 @@ public class Menu {
      * @param metodo Método a ejecutar vía reflection
      * @param parametros array de parámetros que necesita el método
      */
-    public Menu(String action, String metodo, Class[] parametros) {
+    public Menu(String action, String metodo, Class[] parametros, String i18n) {
         ObjectOutputStream os = null;
         try {
             // lo escribe en un outputstream
@@ -69,6 +71,7 @@ public class Menu {
             this.action = action;
             this.metodo = metodo;
             this.parametros = params;
+            this.i18n = i18n;
         } catch (IOException ex) {
             new MenuException(ex, action, metodo);
         } finally {
@@ -78,6 +81,20 @@ public class Menu {
                 ex.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public int compareTo(Menu o) {
+        if (o==null) return -1;
+        return -1*o.getI18n().compareToIgnoreCase(this.i18n);
+    }
+
+    public String getI18n() {
+        return i18n;
+    }
+
+    public void setI18n(String i18n) {
+        this.i18n = i18n;
     }
 
 }

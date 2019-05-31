@@ -109,6 +109,7 @@
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
+                    <debug>false</debug>
                 </configuration>
             </plugin>
             <plugin>
