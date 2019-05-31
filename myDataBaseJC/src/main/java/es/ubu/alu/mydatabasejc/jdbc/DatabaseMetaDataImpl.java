@@ -745,7 +745,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
     
     @Override
-    @MetaDataLink(action = "consulta", namespace = "/tablas", parametros = {"TABLE_SCHEM","TABLE_NAME","TABLE_TYPE"}, columnNumber = 3)
+    @MetaDataLink(action = "consulta", namespace = "/tablas", parametros = {"TABLE_CAT","TABLE_SCHEM","TABLE_NAME","TABLE_TYPE"}, columnNumber = 3)
     public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException {
         return metadata.getTables(catalog, schemaPattern, tableNamePattern, types);
     }

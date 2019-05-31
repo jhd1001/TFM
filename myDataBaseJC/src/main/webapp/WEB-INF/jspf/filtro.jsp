@@ -36,6 +36,7 @@
                         </table>
                         <s:hidden name="metodo"/>
                         <s:hidden name="parametros"/>
+                        <s:hidden name="TABLE_CAT"/>
                         <s:hidden name="TABLE_SCHEM"/>
                         <s:hidden name="TABLE_NAME"/>
                         <s:submit name="filtrar" value="filtrar"/>

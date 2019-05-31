@@ -30,7 +30,7 @@
                 <div>
                     <h1><s:text name="%{TABLE_TYPE}"/></h1>
                     <h2><s:property value="TABLE_NAME"/></h2>
-                    <h3><s:text name="Esquema"/>: <s:property value="TABLE_SCHEM"/></h3>
+                    <h3><s:text name="Esquema"/>: <s:property value="TABLE_CAT"/> <s:property value="TABLE_SCHEM"/></h3>
                 </div>
                 <s:include value="/WEB-INF/jspf/filtro.jsp"/>
                 <div id="resultset">

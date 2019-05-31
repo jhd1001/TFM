@@ -27,7 +27,7 @@
                 <div>
                     <h1><s:text name="%{TABLE_TYPE}"/></h1>
                     <h2><s:property value="TABLE_NAME"/></h2>
-                    <h3><s:text name="Esquema"/>: <s:property value="TABLE_SCHEM"/></h3>
+                    <h3><s:text name="Esquema"/>: <s:property value="TABLE_CAT"/> <s:property value="TABLE_SCHEM"/></h3>
                 </div>
                 <div id="resultset">
                     <div class="centrado" id="filtro-div">
@@ -53,6 +53,7 @@
                                         </tr>
                                     </s:iterator>
                                 </table>
+                                <s:hidden name="TABLE_CAT"/>
                                 <s:hidden name="TABLE_SCHEM"/>
                                 <s:hidden name="TABLE_NAME"/>
                                 <s:hidden name="TABLE_TYPE"/>

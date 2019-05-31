@@ -1,6 +1,7 @@
 package es.ubu.alu.mydatabasejc.actions;
 
 import com.opensymphony.xwork2.Preparable;
+import es.ubu.alu.mydatabasejc.Funciones;
 import es.ubu.alu.mydatabasejc.exceptions.SQLCommandException;
 import es.ubu.alu.mydatabasejc.jdbc.ConnectionImpl;
 import es.ubu.alu.mydatabasejc.jdbc.SQLCommand;
@@ -23,6 +24,7 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
 
     private ConnectionImpl connectionImpl;
     private Map<String, Object> sesion;
+    private String TABLE_CAT;
     private String TABLE_SCHEM;
     private String TABLE_NAME;
     private String TABLE_TYPE;
@@ -71,7 +73,7 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
 
         try {
             SQLCommand sqlComand = new SQLCommand(connectionImpl);
-            if (sqlComand.executeUpdate(TABLE_SCHEM, TABLE_NAME, mapaCompleto, formCampos, formValores) == 0) {
+            if (sqlComand.executeUpdate(TABLE_CAT + TABLE_SCHEM, TABLE_NAME, mapaCompleto, formCampos, formValores) == 0) {
                 sesion.put(ACTION_MESSAGE, "No.se.ha.insertado.ningún.registro");
             } else {
                 sesion.put(ACTION_MESSAGE, "El.registro.ha.sido.insertado");
@@ -136,7 +138,7 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
 
         try {
             SQLCommand sqlComand = new SQLCommand(connectionImpl);
-            if (sqlComand.executeUpdate(TABLE_SCHEM, TABLE_NAME, mapaCompleto, SQLCommand.OPERACION_UPDATE, pkArgumentos, pkValores, formCampos, formValores) == 0) {
+            if (sqlComand.executeUpdate(Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM), TABLE_NAME, mapaCompleto, SQLCommand.OPERACION_UPDATE, pkArgumentos, pkValores, formCampos, formValores) == 0) {
                 sesion.put(ACTION_MESSAGE, "No.se.ha.actualizado.ningún.registro");
             } else {
                 sesion.put(ACTION_MESSAGE, "El.registro.ha.sido.actualizado");
@@ -172,7 +174,7 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
         try {
             SQLCommand sqlComand = new SQLCommand(connectionImpl);
             // y se resuelve el resultset
-            rs = sqlComand.executeQuery(TABLE_SCHEM, TABLE_NAME, mapaCompleto, pkArgumentos, pkValores, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            rs = sqlComand.executeQuery(Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM), TABLE_NAME, mapaCompleto, pkArgumentos, pkValores, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             // se transforma el resultset en una lista para su visualización
             listInfo = getListInfoReverse(rs);
             // se consigue el mapa de campos editables.
@@ -199,7 +201,7 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
 
         try {
             SQLCommand sqlComand = new SQLCommand(connectionImpl);
-            if (sqlComand.executeUpdate(TABLE_SCHEM, TABLE_NAME, mapaCompleto, SQLCommand.OPERACION_DELETE, pkArgumentos, pkValores, null, null) == 0) {
+            if (sqlComand.executeUpdate(Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM), TABLE_NAME, mapaCompleto, SQLCommand.OPERACION_DELETE, pkArgumentos, pkValores, null, null) == 0) {
                 sesion.put(ACTION_ERROR, "No.se.ha.eliminado.ningún.registro");
             } else {
                 sesion.put(ACTION_MESSAGE, "El.registro.ha.sido.eliminado");
@@ -213,7 +215,7 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
 
     public Object getParameter(int i) {
         String[] a = {};
-        return sesion.get(TABLE_SCHEM + "." + TABLE_NAME + "." + arrayParametros.toArray(a)[i]);
+        return sesion.get(Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM) + "." + TABLE_NAME + "." + arrayParametros.toArray(a)[i]);
     }
 
     /**
@@ -295,10 +297,10 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
 
         // establece y recoge los parámetros de búsqueda en sesión del usuario
         Map<String, Integer> mapa = setParametrosSesion(
-                    TABLE_SCHEM == null ? TABLE_NAME
-                            : (TABLE_SCHEM.equals("") ? TABLE_NAME
-                                    : (TABLE_SCHEM.equals("null") ? TABLE_NAME
-                                            : TABLE_SCHEM + "." + TABLE_NAME)));
+                    Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM) == null ? TABLE_NAME
+                            : (Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM).equals("") ? TABLE_NAME
+                                    : (Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM).equals("null") ? TABLE_NAME
+                                            : Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM) + "." + TABLE_NAME)));
 
         // define el array de posibles parámetros para presentarlos en la jsp
         arrayParametros = mapa.keySet();
@@ -308,11 +310,11 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
         ResultSet rs2 = null;
         try {
             SQLCommand sqlCommand = new SQLCommand(connectionImpl);
-            rs = sqlCommand.executeQuery(TABLE_SCHEM, TABLE_NAME, arrayParametros, sesion);
+            rs = sqlCommand.executeQuery(Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM), TABLE_NAME, arrayParametros, sesion);
             // se obtiene una lista con los campos primary key
             List<String> pkList = new ArrayList<>();
             String[] linkParametros = {};
-            rs2 = connectionImpl.getConnection().getMetaData().getPrimaryKeys(null, TABLE_SCHEM == null ? "" : TABLE_SCHEM, TABLE_NAME);
+            rs2 = connectionImpl.getConnection().getMetaData().getPrimaryKeys(null, Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM), TABLE_NAME);
             while (rs2.next()) {
                 pkList.add(rs2.getString("COLUMN_NAME"));
             }
@@ -341,18 +343,18 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
         if (!hasActionErrors()) {
         // busca el mapa del resultset en la sesión del usuario
             mapaCompleto = (Map<String, Integer[]>)sesion.get(
-                    TABLE_SCHEM==null ? TABLE_NAME :
-                        (TABLE_SCHEM.equals("") ? TABLE_NAME : 
-                                TABLE_SCHEM + "." + TABLE_NAME));
+                    Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM)==null ? TABLE_NAME :
+                        (Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM).equals("") ? TABLE_NAME : 
+                                Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM) + "." + TABLE_NAME));
             // si el mapa aún no se ha creado
             if (mapaCompleto == null) {
                 // se calcula y se guarda en la sesión
                 SQLCommand sqlCommand = new SQLCommand(connectionImpl);
-                mapaCompleto = sqlCommand.getMap(TABLE_SCHEM, TABLE_NAME);
+                mapaCompleto = sqlCommand.getMap(Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM), TABLE_NAME);
                 sesion.put(
-                        TABLE_SCHEM==null ? TABLE_NAME :
-                            (TABLE_SCHEM.equals("") ? TABLE_NAME : 
-                                    TABLE_SCHEM + "." + TABLE_NAME), 
+                        Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM)==null ? TABLE_NAME :
+                            (Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM).equals("") ? TABLE_NAME : 
+                                    Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM) + "." + TABLE_NAME), 
                         mapaCompleto);
             }
         }
@@ -375,8 +377,12 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
     }
 
     public String getTABLE_SCHEM() {return TABLE_SCHEM;}
+    
+    public String getTABLE_CAT() {return TABLE_CAT;}
 
     public void setTABLE_SCHEM(String TABLE_SCHEM) {this.TABLE_SCHEM = TABLE_SCHEM;}
+    
+    public void setTABLE_CAT(String TABLE_CAT) {this.TABLE_CAT = TABLE_CAT;}
 
     public String getTABLE_NAME() {return TABLE_NAME;}
 
