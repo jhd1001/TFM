@@ -297,10 +297,9 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
 
         // establece y recoge los parámetros de búsqueda en sesión del usuario
         Map<String, Integer> mapa = setParametrosSesion(
-                    Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM) == null ? TABLE_NAME
-                            : (Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM).equals("") ? TABLE_NAME
+                    Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM).equals("") ? TABLE_NAME
                                     : (Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM).equals("null") ? TABLE_NAME
-                                            : Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM) + "." + TABLE_NAME)));
+                                            : Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM) + "." + TABLE_NAME));
 
         // define el array de posibles parámetros para presentarlos en la jsp
         arrayParametros = mapa.keySet();
@@ -343,18 +342,16 @@ public class TablasAction extends MenuAction implements Preparable, SessionAware
         if (!hasActionErrors()) {
         // busca el mapa del resultset en la sesión del usuario
             mapaCompleto = (Map<String, Integer[]>)sesion.get(
-                    Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM)==null ? TABLE_NAME :
-                        (Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM).equals("") ? TABLE_NAME : 
-                                Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM) + "." + TABLE_NAME));
+                    Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM).equals("") ? TABLE_NAME : 
+                                Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM) + "." + TABLE_NAME);
             // si el mapa aún no se ha creado
             if (mapaCompleto == null) {
                 // se calcula y se guarda en la sesión
                 SQLCommand sqlCommand = new SQLCommand(connectionImpl);
                 mapaCompleto = sqlCommand.getMap(Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM), TABLE_NAME);
                 sesion.put(
-                        Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM)==null ? TABLE_NAME :
-                            (Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM).equals("") ? TABLE_NAME : 
-                                    Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM) + "." + TABLE_NAME), 
+                        Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM).equals("") ? TABLE_NAME : 
+                                    Funciones.getCatalog(TABLE_CAT, TABLE_SCHEM) + "." + TABLE_NAME, 
                         mapaCompleto);
             }
         }

@@ -24,11 +24,14 @@
                 <li><a href="#"><span>Conexión<br><s:property value="connectionImpl.usuario"/></span></a></li>
                 <li class="has-sub"><a href="#"><span>Acerca de</span></a>
                     <ul>
-                        <li><a href="#"><span>Configuración</span></a></li>
-                        <li class="last"><a href="#"><span>Contacto</span></a></li>
+                        <li><a href="#" onclick="alert('Funcionalidad no desarrollada')"><span>Configuración</span></a></li>
                     </ul>
                 </li>
-                <li class="last"><a href="#"><span>Contacto</span></a></li>
+                <li class="has-sub"><a href="#"><span>Contacto</span></a>
+                    <ul>
+                        <li class="last"><a href="#" onclick="alert('Funcionalidad no desarrollada')"><span>Contacto</span></a></li>
+                    </ul>
+                </li>
                 <li class="has-sub active"><a href="#"><span>Métodos DatabaseMetaData</span></a>
                     <ul style="display: block;">
                         <s:iterator value="menus">
